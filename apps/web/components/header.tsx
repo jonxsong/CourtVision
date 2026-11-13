@@ -11,16 +11,16 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link href="/" className="brand" aria-label="CourtVision home">
-          <Image src="/brand/courtvision-mark.png" alt="" width={30} height={30} priority />
+        <Link href="/" className="brand" aria-label="CourtVision home" prefetch={false}>
+          <Image src="/brand/courtvision-mark.webp" alt="" width={30} height={30} priority />
           <span>Court</span><strong>Vision</strong><i aria-hidden="true" />
         </Link>
         <nav aria-label="Primary navigation">
-          {links.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}
+          {links.map(([label, href]) => <Link key={href} href={href} prefetch={false}>{label}</Link>)}
         </nav>
         <div className="header-actions">
-          <Link href="/players" className="icon-link" aria-label="Search players"><Search size={18} /></Link>
-          <Link href="/insights" className="ask-link"><Sparkles size={15} /> Ask CV</Link>
+          <Link href="/players" className="icon-link" aria-label="Search players" prefetch={false}><Search size={18} /></Link>
+          <Link href="/insights" className="ask-link" prefetch={false}><Sparkles size={15} /> Ask CV</Link>
         </div>
       </div>
     </header>

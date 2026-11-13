@@ -5,7 +5,7 @@ import { TeamMark } from "./team-mark";
 
 export function PlayerRow({ player, index }: { player: Player; index: number }) {
   return (
-    <Link className="player-row" href={`/players/${player.id}`}>
+    <Link className="player-row" href={`/players/${player.id}`} prefetch={false}>
       <span className="rank">{String(index + 1).padStart(2, "0")}</span>
       <span className="player-avatar">{player.initials}</span>
       <span className="player-name"><strong>{player.name}</strong><small>{player.position} · #{player.number}</small></span>

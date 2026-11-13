@@ -6,7 +6,7 @@ import { Footer } from "@/components/footer";
 export const metadata: Metadata = {
   title: { default: "CourtVision — NBA Intelligence", template: "%s · CourtVision" },
   description: "See the game beyond the box score. Basketball analytics, visualized with context.",
-  metadataBase: new URL("https://courtvision.local")
+  metadataBase: new URL("https://courtvision-analytics.perkyaisle4.chatgpt.site")
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

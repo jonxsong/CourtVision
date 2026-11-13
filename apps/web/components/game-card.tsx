@@ -23,5 +23,5 @@ export function GameCard({ game, compact = false, source = "demo", linked = true
       {!compact && <div className="game-card-bottom"><span>{game.headline}</span><ArrowUpRight size={16} /></div>}
     </>
   );
-  return linked ? <Link href={`/games/${game.id}`} className={className}>{content}</Link> : <article className={className}>{content}</article>;
+  return linked ? <Link href={`/games/${game.id}`} className={className} prefetch={false}>{content}</Link> : <article className={className}>{content}</article>;
 }

@@ -5,11 +5,11 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div>
-        <Link href="/" className="brand"><Image src="/brand/courtvision-mark.png" alt="" width={30} height={30} /><span>Court</span><strong>Vision</strong><i /></Link>
+        <Link href="/" className="brand" prefetch={false}><Image src="/brand/courtvision-mark.webp" alt="" width={30} height={30} /><span>Court</span><strong>Vision</strong><i /></Link>
         <p>See the game beyond the box score.</p>
       </div>
       <div className="footer-meta">
-        <Link href="/operations">Data operations</Link>
+        <Link href="/operations" prefetch={false}>Data operations</Link>
         <span>Built for transparent basketball analysis.</span>
         <span>Demo fixtures are synthetic and clearly labeled.</span>
       </div>
