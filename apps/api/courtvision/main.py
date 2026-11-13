@@ -14,6 +14,7 @@ from courtvision.api.routes import router
 from courtvision.config import get_settings
 from courtvision.logging import configure_logging
 from courtvision.providers import create_provider
+from courtvision.realtime import RedisGameEventBus
 from courtvision.schemas import HealthResponse
 
 settings = get_settings()
@@ -24,6 +25,9 @@ logger = structlog.get_logger()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.provider = create_provider(settings)
+    app.state.event_bus = RedisGameEventBus.from_url(
+        settings.redis_url, channel_prefix=settings.redis_channel_prefix
+    )
     logger.info("application_started", version=__version__, provider=settings.data_provider)
     try:
         yield
@@ -31,6 +35,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         close = getattr(app.state.provider, "close", None)
         if close:
             await close()
+        await app.state.event_bus.close()
         logger.info("application_stopped")
 
 

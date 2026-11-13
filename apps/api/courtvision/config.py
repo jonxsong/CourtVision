@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     env: Literal["development", "test", "production"] = "development"
     database_url: str = "postgresql+asyncpg://courtvision:courtvision@localhost:5432/courtvision"
     redis_url: str = "redis://localhost:6379/0"
+    redis_channel_prefix: str = "courtvision"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     data_provider: Literal["demo", "balldontlie", "sportradar"] = "demo"
     balldontlie_api_key: str | None = None
