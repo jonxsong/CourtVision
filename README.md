@@ -9,7 +9,7 @@
 [![Web](https://img.shields.io/badge/Next.js-16-0b0b0a?style=flat-square&logo=nextdotjs)](apps/web)
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
-[![Tests](https://img.shields.io/badge/tests-14_passing-66c78f?style=flat-square)](#verification)
+[![Tests](https://img.shields.io/badge/tests-19_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-ff6529?style=flat-square)](DATA_SOURCES.md)
 
 </div>
@@ -34,7 +34,8 @@ CourtVision is not a generic stats dashboard and it does not manufacture NBA dat
 | `/insights` | Grounded-analysis UX with fact/interpretation separation | ✅ demo retrieval |
 | FastAPI | Typed players, games, shots, replay, and baseline endpoints | ✅ |
 | PostgreSQL | Normalized schema and initial Alembic migration | ✅ |
-| Redis/live provider | Pub/Sub contract and licensed provider integration | planned |
+| Replay WebSocket | Snapshot, heartbeat, ordered resume | ✅ historical demo |
+| Redis/live provider | Multi-instance Pub/Sub and licensed live feed | planned |
 | ML | Transparent demo baseline | ✅ unvalidated |
 | Trained XGBoost + calibration | Needs licensed historical play-by-play corpus | blocked by data |
 | OpenAI Agents + MCP | Typed tool boundary designed; production integration | planned |
@@ -118,7 +119,7 @@ Current local checkpoint:
 - ESLint with zero warnings: pass
 - TypeScript strict check: pass
 - Vitest: 4 tests pass
-- Pytest: 10 tests pass
+- Pytest: 15 tests pass
 - Ruff: pass
 - mypy strict: pass
 

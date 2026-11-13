@@ -31,9 +31,10 @@ Status as of November 12, 2026.
 
 - [x] normalized ordered event contract
 - [x] historical replay interaction
+- [x] WebSocket snapshot/replay/heartbeat protocol
 - [ ] ingestion worker and scheduler
 - [ ] Redis Pub/Sub implementation
-- [ ] WebSocket heartbeat, gap recovery, and polling fallback
+- [ ] Redis fan-out, multi-instance gap recovery, and polling fallback
 - [ ] credentialed live provider and rights confirmation
 
 ## Phase 4 — Machine learning

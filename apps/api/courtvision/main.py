@@ -5,9 +5,9 @@ from time import perf_counter
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse
 
 from courtvision import __version__
+from courtvision.api.realtime import router as realtime_router
 from courtvision.api.routes import router
 from courtvision.config import get_settings
 from courtvision.logging import configure_logging
@@ -31,7 +31,6 @@ app = FastAPI(
     title="CourtVision API",
     version=__version__,
     description="Typed basketball analytics API. Demo mode contains synthetic fixtures only.",
-    default_response_class=ORJSONResponse,
     lifespan=lifespan,
 )
 app.add_middleware(
@@ -41,6 +40,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
 )
+app.state.allowed_origins = settings.cors_origins
 
 
 @app.middleware("http")
@@ -68,3 +68,4 @@ async def health() -> HealthResponse:
 
 
 app.include_router(router)
+app.include_router(realtime_router)
