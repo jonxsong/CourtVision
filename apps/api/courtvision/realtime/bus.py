@@ -45,6 +45,12 @@ class RedisClient(Protocol):
     async def aclose(self) -> None: ...
 
 
+class GameEventBus(Protocol):
+    async def publish(self, game_id: str, event: GameEvent) -> int: ...
+
+    def subscribe(self, game_id: str) -> AsyncIterator[PublishedGameEvent]: ...
+
+
 class RedisGameEventBus:
     """Versioned Redis Pub/Sub transport for normalized game events.
 

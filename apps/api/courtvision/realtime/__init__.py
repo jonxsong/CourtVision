@@ -3,6 +3,7 @@
 from courtvision.realtime.bus import (
     EventBusMessageError,
     EventBusUnavailable,
+    GameEventBus,
     PublishedGameEvent,
     RedisGameEventBus,
 )
@@ -10,6 +11,7 @@ from courtvision.realtime.bus import (
 __all__ = [
     "EventBusMessageError",
     "EventBusUnavailable",
+    "GameEventBus",
     "PublishedGameEvent",
     "RedisGameEventBus",
 ]

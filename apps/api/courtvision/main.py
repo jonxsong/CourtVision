@@ -25,9 +25,12 @@ logger = structlog.get_logger()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.provider = create_provider(settings)
-    app.state.event_bus = RedisGameEventBus.from_url(
+    event_bus = RedisGameEventBus.from_url(
         settings.redis_url, channel_prefix=settings.redis_channel_prefix
     )
+    app.state.event_bus = event_bus
+    app.state.live_poll_interval_seconds = settings.live_poll_interval_seconds
+    app.state.websocket_heartbeat_seconds = settings.websocket_heartbeat_seconds
     logger.info("application_started", version=__version__, provider=settings.data_provider)
     try:
         yield
@@ -35,7 +38,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         close = getattr(app.state.provider, "close", None)
         if close:
             await close()
-        await app.state.event_bus.close()
+        await event_bus.close()
         logger.info("application_stopped")
 
 
