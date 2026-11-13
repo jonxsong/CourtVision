@@ -130,6 +130,82 @@ test("serves a cached browser-safe live slate", async () => {
   assert.equal(upstreamCalls, 1);
 });
 
+test("requires a server-side OpenAI secret for Ask CV", async () => {
+  const response = await worker.fetch(
+    new Request("https://api.test/api/ask", {
+      method: "POST",
+      headers: { origin: MAIN_ORIGIN, "content-type": "application/json" },
+      body: JSON.stringify({ question: "Who leads the NBA in scoring?" }),
+    }),
+    {},
+    { waitUntil() {} },
+  );
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+});
+
+test("grounds Ask CV answers with CourtVision player tools", async () => {
+  const requests = [];
+  globalThis.fetch = async (input, options) => {
+    const url = new URL(input);
+    assert.equal(url.origin, "https://api.openai.com");
+    assert.equal(options.headers.Authorization, "Bearer openai-secret");
+    const body = JSON.parse(options.body);
+    requests.push(body);
+    if (requests.length === 1) {
+      return Response.json({
+        id: "resp_tool",
+        model: "gpt-6-luna",
+        output: [{
+          type: "function_call",
+          name: "get_player",
+          call_id: "call_luka",
+          arguments: JSON.stringify({ player: "Luka Dončić" }),
+        }],
+      });
+    }
+    const toolOutput = JSON.parse(body.input[0].output);
+    assert.equal(toolOutput.name, "Luka Dončić");
+    assert.equal(toolOutput.source, "NBA Stats");
+    return Response.json({
+      id: "resp_answer",
+      model: "gpt-6-luna",
+      output: [{ type: "message", content: [{ type: "output_text", text: "Luka is averaging 38.6 points per game. [NBA Stats]" }] }],
+    });
+  };
+
+  const response = await worker.fetch(
+    new Request("https://api.test/api/ask", {
+      method: "POST",
+      headers: { origin: MAIN_ORIGIN, "content-type": "application/json" },
+      body: JSON.stringify({ question: "How is Luka scoring this season?", history: [] }),
+    }),
+    { COURTVISION_OPENAI_API_KEY: "openai-secret" },
+    { waitUntil() {} },
+  );
+  const payload = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.match(payload.answer, /38\.6 points/);
+  assert.deepEqual(payload.sources, ["NBA Stats"]);
+  assert.equal(requests.length, 2);
+  assert.equal(requests[1].previous_response_id, "resp_tool");
+});
+
+test("validates Ask CV question length before calling OpenAI", async () => {
+  globalThis.fetch = async () => { throw new Error("fetch should not run"); };
+  const response = await worker.fetch(
+    new Request("https://api.test/api/ask", {
+      method: "POST",
+      headers: { origin: MAIN_ORIGIN, "content-type": "application/json" },
+      body: JSON.stringify({ question: "" }),
+    }),
+    { COURTVISION_OPENAI_API_KEY: "openai-secret" },
+    { waitUntil() {} },
+  );
+  assert.equal(response.status, 400);
+});
+
 test("rejects an untrusted browser origin", async () => {
   const response = await worker.fetch(
     new Request("https://api.test/api/games", { headers: { origin: "https://evil.example" } }),

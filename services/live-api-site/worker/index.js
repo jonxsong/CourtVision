@@ -4,8 +4,11 @@ const MAIN_SITE_ORIGIN = "https://courtvision-analytics.perkyaisle4.chatgpt.site
 const ALLOWED_ORIGINS = new Set([MAIN_SITE_ORIGIN, "http://localhost:3000"]);
 const PROVIDER_ORIGIN = "https://api.balldontlie.io";
 const NBA_STATS_ORIGIN = "https://stats.nba.com";
+const OPENAI_ORIGIN = "https://api.openai.com";
 const GAMES_CACHE_SECONDS = 60;
 const NBA_CACHE_SECONDS = 15 * 60;
+const ASK_MODEL = "gpt-6-luna";
+const ASK_MAX_ROUNDS = 4;
 
 const gamesCache = { inFlight: null, value: null, updatedAt: 0 };
 const playersCache = { inFlight: null, value: null, updatedAt: 0 };
@@ -175,7 +178,7 @@ function normalizeShot(row) {
 function responseHeaders(origin = MAIN_SITE_ORIGIN, cacheSeconds = GAMES_CACHE_SECONDS) {
   return {
     "access-control-allow-origin": origin,
-    "access-control-allow-methods": "GET, OPTIONS",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
     "access-control-allow-headers": "Content-Type",
     "cache-control": `public, max-age=30, s-maxage=${cacheSeconds}, stale-if-error=900`,
     "content-type": "application/json; charset=utf-8",
@@ -183,6 +186,12 @@ function responseHeaders(origin = MAIN_SITE_ORIGIN, cacheSeconds = GAMES_CACHE_S
     "x-content-type-options": "nosniff",
     "x-frame-options": "DENY",
   };
+}
+
+function privateJson(payload, status = 200, origin = MAIN_SITE_ORIGIN) {
+  const headers = responseHeaders(origin, 0);
+  headers["cache-control"] = "no-store";
+  return new Response(JSON.stringify(payload), { status, headers });
 }
 
 function json(payload, status = 200, origin = MAIN_SITE_ORIGIN, cacheSeconds = GAMES_CACHE_SECONDS) {
@@ -368,6 +377,285 @@ async function liveShots(url, origin) {
   }
 }
 
+function normalizedSearch(value) {
+  return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+function findPlayer(value) {
+  const needle = normalizedSearch(value);
+  if (!needle) return null;
+  return BUNDLED_PLAYERS.players.find((player) => String(player.id) === needle)
+    ?? BUNDLED_PLAYERS.players.find((player) => normalizedSearch(player.name) === needle)
+    ?? BUNDLED_PLAYERS.players.find((player) => normalizedSearch(player.name).includes(needle))
+    ?? null;
+}
+
+function playerFact(player) {
+  if (!player) return null;
+  return {
+    source: "NBA Stats",
+    season: player.season,
+    id: player.id,
+    name: player.name,
+    position: player.position,
+    number: player.number,
+    team: player.team,
+    gamesPlayed: player.stats.gamesPlayed,
+    stats: player.stats,
+  };
+}
+
+function searchPlayerFacts(query, limit = 8) {
+  const needle = normalizedSearch(query);
+  const matches = BUNDLED_PLAYERS.players.filter((player) => {
+    const haystack = normalizedSearch(`${player.name} ${player.team.city} ${player.team.name} ${player.team.abbreviation}`);
+    return !needle || haystack.includes(needle);
+  });
+  return {
+    source: "NBA Stats",
+    season: BUNDLED_PLAYERS.season,
+    matches: matches.slice(0, Math.min(Math.max(Number(limit) || 8, 1), 15)).map(playerFact),
+  };
+}
+
+const LEADER_METRICS = {
+  points: "points",
+  rebounds: "rebounds",
+  assists: "assists",
+  steals: "steals",
+  blocks: "blocks",
+  true_shooting: "trueShootingPct",
+  net_rating: "netRating",
+};
+
+function leagueLeaders(metric, limit = 10) {
+  const key = LEADER_METRICS[metric];
+  if (!key) return { error: "Unsupported metric" };
+  const leaders = BUNDLED_PLAYERS.players
+    .filter((player) => Number.isFinite(player.stats[key]))
+    .toSorted((left, right) => Number(right.stats[key]) - Number(left.stats[key]))
+    .slice(0, Math.min(Math.max(Number(limit) || 10, 1), 15))
+    .map((player, index) => ({ rank: index + 1, ...playerFact(player), value: player.stats[key], metric }));
+  return { source: "NBA Stats", season: BUNDLED_PLAYERS.season, metric, leaders };
+}
+
+async function gameFacts(env) {
+  try {
+    const payload = gamesCache.value ?? await fetchProvider(env.COURTVISION_BALLDONTLIE_API_KEY);
+    return { source: "BALLDONTLIE", fetchedAt: payload.fetchedAt, gameDate: payload.gameDate, games: payload.games };
+  } catch {
+    return { source: "BALLDONTLIE", unavailable: true, message: "The live game slate is temporarily unavailable." };
+  }
+}
+
+async function shotProfile(value) {
+  const player = findPlayer(value);
+  if (!player) return { error: "Player not found" };
+  try {
+    const response = await fetch(`${MAIN_SITE_ORIGIN}/data/shots/${encodeURIComponent(player.id)}.json`, {
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!response.ok) throw new Error("Shot snapshot unavailable");
+    const payload = await response.json();
+    const zones = {};
+    for (const shot of payload.shots ?? []) {
+      const zone = String(shot.zone ?? "Unknown");
+      zones[zone] ??= { attempts: 0, makes: 0 };
+      zones[zone].attempts += 1;
+      if (shot.made) zones[zone].makes += 1;
+    }
+    return {
+      source: "NBA Stats shot chart",
+      season: payload.season,
+      player: playerFact(player),
+      attempts: payload.shots?.length ?? 0,
+      zones: Object.entries(zones).map(([zone, totals]) => ({
+        zone,
+        attempts: totals.attempts,
+        makes: totals.makes,
+        fieldGoalPct: totals.attempts ? totals.makes / totals.attempts : null,
+      })),
+    };
+  } catch {
+    return { source: "NBA Stats shot chart", player: playerFact(player), unavailable: true };
+  }
+}
+
+const ASK_TOOLS = [
+  {
+    type: "function", name: "search_players",
+    description: "Search active NBA players by player name, team name, city, or abbreviation.",
+    strict: true,
+    parameters: {
+      type: "object",
+      properties: { query: { type: "string" }, limit: { type: "integer", minimum: 1, maximum: 15 } },
+      required: ["query", "limit"], additionalProperties: false,
+    },
+  },
+  {
+    type: "function", name: "get_player",
+    description: "Get a current-season NBA player profile and base/advanced statistics by name or ID.",
+    strict: true,
+    parameters: {
+      type: "object", properties: { player: { type: "string" } }, required: ["player"], additionalProperties: false,
+    },
+  },
+  {
+    type: "function", name: "compare_players",
+    description: "Compare two current NBA players using the same current-season statistical fields.",
+    strict: true,
+    parameters: {
+      type: "object",
+      properties: { player_a: { type: "string" }, player_b: { type: "string" } },
+      required: ["player_a", "player_b"], additionalProperties: false,
+    },
+  },
+  {
+    type: "function", name: "get_league_leaders",
+    description: "Rank current NBA players for a supported metric.",
+    strict: true,
+    parameters: {
+      type: "object",
+      properties: {
+        metric: { type: "string", enum: Object.keys(LEADER_METRICS) },
+        limit: { type: "integer", minimum: 1, maximum: 15 },
+      },
+      required: ["metric", "limit"], additionalProperties: false,
+    },
+  },
+  {
+    type: "function", name: "get_games",
+    description: "Get the current NBA game slate, scores, statuses, and tipoff times.",
+    strict: true,
+    parameters: { type: "object", properties: {}, required: [], additionalProperties: false },
+  },
+  {
+    type: "function", name: "get_shot_profile",
+    description: "Get a real current-season shot-zone profile for an NBA player.",
+    strict: true,
+    parameters: {
+      type: "object", properties: { player: { type: "string" } }, required: ["player"], additionalProperties: false,
+    },
+  },
+];
+
+async function executeAskTool(name, args, env) {
+  if (name === "search_players") return searchPlayerFacts(args.query, args.limit);
+  if (name === "get_player") return playerFact(findPlayer(args.player)) ?? { error: "Player not found" };
+  if (name === "compare_players") {
+    return {
+      source: "NBA Stats", season: BUNDLED_PLAYERS.season,
+      players: [playerFact(findPlayer(args.player_a)), playerFact(findPlayer(args.player_b))].filter(Boolean),
+    };
+  }
+  if (name === "get_league_leaders") return leagueLeaders(args.metric, args.limit);
+  if (name === "get_games") return gameFacts(env);
+  if (name === "get_shot_profile") return shotProfile(args.player);
+  return { error: `Unknown tool: ${name}` };
+}
+
+function openAIText(response) {
+  return (response.output ?? [])
+    .filter((item) => item.type === "message")
+    .flatMap((item) => item.content ?? [])
+    .filter((item) => item.type === "output_text")
+    .map((item) => item.text)
+    .join("\n")
+    .trim();
+}
+
+async function openAIResponse(apiKey, body) {
+  const response = await fetch(`${OPENAI_ORIGIN}/v1/responses`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(35_000),
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    const code = payload?.error?.code ?? payload?.error?.type ?? "openai_error";
+    throw new Error(`${code}:${response.status}`);
+  }
+  return response.json();
+}
+
+function safeConversation(history, question) {
+  const messages = Array.isArray(history) ? history.slice(-8) : [];
+  const clean = messages
+    .filter((message) => ["user", "assistant"].includes(message?.role) && typeof message?.content === "string")
+    .map((message) => ({ role: message.role, content: message.content.slice(0, 2_000) }));
+  clean.push({ role: "user", content: question });
+  return clean;
+}
+
+async function askCourtVision(request, env, origin) {
+  if (!env.COURTVISION_OPENAI_API_KEY) return privateJson({ error: "Ask CV is not configured" }, 503, origin);
+  let input;
+  try {
+    input = await request.json();
+  } catch {
+    return privateJson({ error: "A JSON request body is required" }, 400, origin);
+  }
+  const question = String(input?.question ?? "").trim();
+  if (question.length < 2 || question.length > 500) {
+    return privateJson({ error: "Question must contain 2 to 500 characters" }, 400, origin);
+  }
+
+  const usedSources = new Set();
+  const instructions = `You are Ask CV, CourtVision's concise NBA research assistant. Current date: ${new Date().toISOString().slice(0, 10)}. Use the supplied tools for every claim about current players, rankings, games, or shot profiles. Never invent a statistic, result, injury, transaction, or unavailable field. Distinguish facts from interpretation. Cite retrieved current facts inline with [NBA Stats], [NBA Stats shot chart], or [BALLDONTLIE]. You may explain stable basketball concepts from general knowledge, but say when a historical or current fact is outside CourtVision's available data. Prefer a direct answer followed by compact supporting bullets when useful.`;
+  let body = {
+    model: env.COURTVISION_OPENAI_MODEL || ASK_MODEL,
+    instructions,
+    input: safeConversation(input?.history, question),
+    tools: ASK_TOOLS,
+    parallel_tool_calls: false,
+    max_output_tokens: 800,
+  };
+
+  try {
+    for (let round = 0; round < ASK_MAX_ROUNDS; round += 1) {
+      const response = await openAIResponse(env.COURTVISION_OPENAI_API_KEY, body);
+      const calls = (response.output ?? []).filter((item) => item.type === "function_call");
+      if (!calls.length) {
+        const answer = openAIText(response);
+        if (!answer) throw new Error("empty_response:502");
+        return privateJson({
+          answer,
+          model: response.model ?? body.model,
+          sources: [...usedSources],
+          season: BUNDLED_PLAYERS.season,
+        }, 200, origin);
+      }
+      const outputs = [];
+      for (const call of calls) {
+        let args = {};
+        try { args = JSON.parse(call.arguments || "{}"); } catch { args = {}; }
+        const result = await executeAskTool(call.name, args, env);
+        if (result?.source) usedSources.add(result.source);
+        outputs.push({ type: "function_call_output", call_id: call.call_id, output: JSON.stringify(result) });
+      }
+      body = {
+        model: env.COURTVISION_OPENAI_MODEL || ASK_MODEL,
+        instructions,
+        previous_response_id: response.id,
+        input: outputs,
+        tools: ASK_TOOLS,
+        parallel_tool_calls: false,
+        max_output_tokens: 800,
+      };
+    }
+    throw new Error("tool_round_limit:502");
+  } catch (error) {
+    const [code, statusText] = String(error?.message ?? "openai_error:502").split(":");
+    const upstreamStatus = Number(statusText);
+    const status = upstreamStatus === 429 ? 429 : upstreamStatus === 401 ? 503 : 502;
+    const message = upstreamStatus === 429
+      ? "Ask CV has reached its current API usage limit."
+      : "Ask CV could not complete that answer right now.";
+    return privateJson({ error: message, code }, status, origin);
+  }
+}
+
 function resetCachesForTest() {
   gamesCache.inFlight = null; gamesCache.value = null; gamesCache.updatedAt = 0;
   playersCache.inFlight = null; playersCache.value = null; playersCache.updatedAt = 0;
@@ -387,10 +675,11 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: responseHeaders(responseOrigin) });
     }
+    if (url.pathname === "/api/ask" && request.method === "POST") return askCourtVision(request, env, responseOrigin);
     if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, responseOrigin);
     if (url.pathname === "/" || url.pathname === "/index.html") return statusPage(responseOrigin);
     if (url.pathname === "/health") {
-      return json({ status: "ok", service: "courtvision-live-data", gamesConfigured: Boolean(env.COURTVISION_BALLDONTLIE_API_KEY), nbaStatsConfigured: true }, 200, responseOrigin);
+      return json({ status: "ok", service: "courtvision-live-data", gamesConfigured: Boolean(env.COURTVISION_BALLDONTLIE_API_KEY), nbaStatsConfigured: true, askConfigured: Boolean(env.COURTVISION_OPENAI_API_KEY) }, 200, responseOrigin);
     }
     if (url.pathname === "/api/games") return liveGames(env, ctx, responseOrigin);
     if (url.pathname === "/api/players") return livePlayers(responseOrigin);
