@@ -133,6 +133,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .source-state { grid-column: 2; grid-row: 1; }
   .setup-grid { grid-template-columns: 1fr; }
   .setup-links { grid-column: auto; flex-direction: column; }
+  .date-rule { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .date-rule b { max-width: 100%; white-space: normal; }
+  .live-refresh { flex-wrap: wrap; line-height: 1.6; }
 }
 
 @media (prefers-reduced-motion: reduce) {
