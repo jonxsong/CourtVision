@@ -25,8 +25,13 @@ logger = structlog.get_logger()
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.provider = create_provider(settings)
     logger.info("application_started", version=__version__, provider=settings.data_provider)
-    yield
-    logger.info("application_stopped")
+    try:
+        yield
+    finally:
+        close = getattr(app.state.provider, "close", None)
+        if close:
+            await close()
+        logger.info("application_stopped")
 
 
 app = FastAPI(

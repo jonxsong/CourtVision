@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     data_provider: Literal["demo", "balldontlie", "sportradar"] = "demo"
+    balldontlie_api_key: str | None = None
+    balldontlie_base_url: str = "https://api.balldontlie.io"
+    provider_timeout_seconds: float = 20.0
     log_level: str = "INFO"
     openai_api_key: str | None = None
     request_rate_limit_per_minute: int = 120

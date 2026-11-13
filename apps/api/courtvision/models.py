@@ -161,6 +161,10 @@ class PlayByPlayEvent(Identified, Base):
     team_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("teams.id"))
     player_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("players.id"))
     occurred_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    checksum: Mapped[str | None] = mapped_column(String(64), index=True)
+    ingestion_job_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("ingestion_jobs.id", ondelete="SET NULL")
+    )
     payload: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
 
 
@@ -208,11 +212,19 @@ class IngestionJob(Identified, Base):
     __tablename__ = "ingestion_jobs"
     source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("data_sources.id"), index=True)
     kind: Mapped[str] = mapped_column(String(80))
+    provider_version: Mapped[str | None] = mapped_column(String(40))
+    target_external_id: Mapped[str | None] = mapped_column(String(160), index=True)
     cursor: Mapped[str | None] = mapped_column(String(500))
+    batch_checksum: Mapped[str | None] = mapped_column(String(64), index=True)
     status: Mapped[IngestionStatus] = mapped_column(Enum(IngestionStatus), index=True)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     rows_processed: Mapped[int] = mapped_column(Integer, default=0)
+    rows_received: Mapped[int] = mapped_column(Integer, default=0)
+    rows_inserted: Mapped[int] = mapped_column(Integer, default=0)
+    rows_updated: Mapped[int] = mapped_column(Integer, default=0)
+    rows_unchanged: Mapped[int] = mapped_column(Integer, default=0)
+    metadata_json: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
     error: Mapped[str | None] = mapped_column(Text)
 
 

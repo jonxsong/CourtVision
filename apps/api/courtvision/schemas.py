@@ -103,6 +103,8 @@ class ShotDataset(BaseModel):
     season: str
     shots: list[Shot]
     provenance: Provenance
+    available: bool = True
+    unavailable_reason: str | None = None
 
 
 class PageMeta(BaseModel):
