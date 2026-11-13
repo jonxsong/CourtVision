@@ -1,3 +1,4 @@
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from time import perf_counter
@@ -5,6 +6,7 @@ from time import perf_counter
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import Response
 
 from courtvision import __version__
 from courtvision.api.realtime import router as realtime_router
@@ -20,7 +22,7 @@ logger = structlog.get_logger()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.provider = create_provider(settings)
     logger.info("application_started", version=__version__, provider=settings.data_provider)
     yield
@@ -44,7 +46,9 @@ app.state.allowed_origins = settings.cors_origins
 
 
 @app.middleware("http")
-async def request_logging(request: Request, call_next):
+async def request_logging(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
     started = perf_counter()
     response = await call_next(request)
     logger.info(

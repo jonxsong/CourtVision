@@ -36,7 +36,7 @@ pnpm --filter @courtvision/web build
 
 .venv\Scripts\python -m pytest apps/api/tests
 .venv\Scripts\python -m ruff check apps/api/courtvision apps/api/tests
-.venv\Scripts\python -m mypy apps/api/courtvision
+.venv\Scripts\python -m mypy --config-file apps/api/pyproject.toml apps/api/courtvision
 ```
 
 ## Conventions

@@ -55,6 +55,10 @@ python_version = "3.11"
 strict = true
 plugins = ["pydantic.mypy"]
 
+[[tool.mypy.overrides]]
+module = ["joblib", "pandas", "pandas.*", "sklearn", "sklearn.*"]
+ignore_missing_imports = true
+
 [tool.coverage.run]
 source = ["courtvision"]
 branch = true

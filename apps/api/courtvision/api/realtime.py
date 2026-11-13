@@ -1,15 +1,17 @@
 import asyncio
+from typing import cast
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 
 from courtvision.providers.base import BasketballDataProvider
+from courtvision.schemas import GameEvent
 from courtvision.services.replay import ReplayBuffer, ReplayInvariantError
 
 router = APIRouter()
 
 
-def _event_payload(event) -> dict[str, object]:
-    return event.model_dump(mode="json")
+def _event_payload(event: GameEvent) -> dict[str, object]:
+    return cast(dict[str, object], event.model_dump(mode="json"))
 
 
 @router.websocket("/api/v1/ws/games/{game_id}")

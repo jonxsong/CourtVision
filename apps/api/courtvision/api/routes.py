@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/api/v1")
 
 
 def provider(request: Request) -> BasketballDataProvider:
-    return request.app.state.provider
+    return cast(BasketballDataProvider, request.app.state.provider)
 
 
 Provider = Annotated[BasketballDataProvider, Depends(provider)]

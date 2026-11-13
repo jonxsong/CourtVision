@@ -36,5 +36,5 @@ jobs:
           cache: pip
       - run: pip install -e "apps/api[dev]"
       - run: python -m ruff check apps/api/courtvision apps/api/tests
-      - run: python -m mypy apps/api/courtvision
+      - run: python -m mypy --config-file apps/api/pyproject.toml apps/api/courtvision
       - run: python -m pytest apps/api/tests

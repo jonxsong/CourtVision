@@ -1,6 +1,6 @@
 # Win probability model
 
-CourtVision currently ships a transparent deterministic baseline for interface development. It is explicitly returned with `is_validated: false` and must not be described as an NBA prediction model.
+CourtVision currently ships a transparent deterministic baseline for interface development. It is explicitly returned with `is_validated: false` and must not be described as an NBA prediction model. A reproducible calibrated-logistic training command is implemented, but no model artifact is checked in because there is no licensed historical corpus in this repository.
 
 ## Target production pipeline
 
@@ -48,3 +48,14 @@ Each `MLModelVersion` records the training cutoff, feature schema, evaluation me
 ## Current baseline
 
 `services/win_probability.py` uses a bounded logistic expression over score differential, time remaining, possession proxy, and fictional strength inputs. It exists to test API/UI contracts and replay behavior only. There is no performance claim because no licensed historical corpus has been trained or evaluated.
+
+## Training command
+
+The input is one row per event with the required fields documented in `courtvision/ml/pipeline.py`.
+
+```bash
+cd apps/api
+python -m courtvision.ml.train --input ../../data/processed/events.csv --output ../../artifacts
+```
+
+The command validates the frame, splits whole games chronologically, trains logistic regression, calibrates only on validation data, evaluates once on test data, and writes a content-addressed joblib artifact plus JSON report. The report includes both model and naive constant-baseline Brier/log-loss values and a `beats_baseline` gate.

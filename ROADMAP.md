@@ -41,9 +41,9 @@ Status as of November 12, 2026.
 
 - [x] transparent unvalidated interface baseline
 - [x] leakage and evaluation specification
+- [x] reproducible chronological split, calibration, and evaluation pipeline
 - [ ] licensed historical event dataset
-- [ ] reproducible feature builder
-- [ ] chronological evaluation pipeline
+- [ ] provider-specific feature materialization job
 - [ ] XGBoost candidate and probability calibration
 - [ ] artifact registry integration and model card
 

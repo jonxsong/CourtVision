@@ -53,12 +53,12 @@ class DataSource(Identified, Base):
     name: Mapped[str] = mapped_column(String(100))
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     terms_url: Mapped[str | None] = mapped_column(String(500))
-    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict)
+    metadata_json: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
 
 
 class Team(Identified, Base):
     __tablename__ = "teams"
-    external_ids: Mapped[dict] = mapped_column(JSON, default=dict)
+    external_ids: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
     abbreviation: Mapped[str] = mapped_column(String(4), unique=True, index=True)
     city: Mapped[str] = mapped_column(String(80))
     name: Mapped[str] = mapped_column(String(80))
@@ -67,7 +67,7 @@ class Team(Identified, Base):
 
 class Player(Identified, Base):
     __tablename__ = "players"
-    external_ids: Mapped[dict] = mapped_column(JSON, default=dict)
+    external_ids: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
     slug: Mapped[str] = mapped_column(String(120), unique=True, index=True)
     first_name: Mapped[str] = mapped_column(String(80))
     last_name: Mapped[str] = mapped_column(String(80), index=True)
@@ -98,7 +98,7 @@ class PlayerTeamMembership(Identified, Base):
 class Game(Identified, Base):
     __tablename__ = "games"
     __table_args__ = (Index("ix_games_season_tipoff", "season_id", "tipoff_at"),)
-    external_ids: Mapped[dict] = mapped_column(JSON, default=dict)
+    external_ids: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
     source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("data_sources.id"))
     season_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("seasons.id"))
     tipoff_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
@@ -161,7 +161,7 @@ class PlayByPlayEvent(Identified, Base):
     team_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("teams.id"))
     player_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("players.id"))
     occurred_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    payload: Mapped[dict] = mapped_column(JSON, default=dict)
+    payload: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
 
 
 class ShotAttempt(Identified, Base):
@@ -188,8 +188,8 @@ class PlayerSeasonStat(Identified, Base):
     season_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("seasons.id"), index=True)
     games_played: Mapped[int] = mapped_column(Integer)
     minutes: Mapped[Decimal] = mapped_column(Numeric(8, 1))
-    totals: Mapped[dict] = mapped_column(JSON)
-    derived: Mapped[dict] = mapped_column(JSON)
+    totals: Mapped[dict[str, object]] = mapped_column(JSON)
+    derived: Mapped[dict[str, object]] = mapped_column(JSON)
     source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("data_sources.id"))
 
 
@@ -199,8 +199,8 @@ class TeamSeasonStat(Identified, Base):
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("teams.id"), index=True)
     season_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("seasons.id"))
     games_played: Mapped[int] = mapped_column(Integer)
-    totals: Mapped[dict] = mapped_column(JSON)
-    derived: Mapped[dict] = mapped_column(JSON)
+    totals: Mapped[dict[str, object]] = mapped_column(JSON)
+    derived: Mapped[dict[str, object]] = mapped_column(JSON)
     source_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("data_sources.id"))
 
 
@@ -221,8 +221,8 @@ class MLModelVersion(Identified, Base):
     name: Mapped[str] = mapped_column(String(100), index=True)
     version: Mapped[str] = mapped_column(String(80))
     trained_through: Mapped[date] = mapped_column(Date)
-    feature_schema: Mapped[dict] = mapped_column(JSON)
-    metrics: Mapped[dict] = mapped_column(JSON)
+    feature_schema: Mapped[dict[str, object]] = mapped_column(JSON)
+    metrics: Mapped[dict[str, object]] = mapped_column(JSON)
     artifact_uri: Mapped[str] = mapped_column(String(500))
     is_active: Mapped[bool] = mapped_column(Boolean, default=False)
     __table_args__ = (UniqueConstraint("name", "version"),)
@@ -238,5 +238,5 @@ class WinProbabilityPrediction(Identified, Base):
     event_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("play_by_play_events.id"))
     model_version_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ml_model_versions.id"))
     home_win_probability: Mapped[Decimal] = mapped_column(Numeric(6, 5))
-    features: Mapped[dict] = mapped_column(JSON)
-    explanation: Mapped[dict] = mapped_column(JSON)
+    features: Mapped[dict[str, object]] = mapped_column(JSON)
+    explanation: Mapped[dict[str, object]] = mapped_column(JSON)
