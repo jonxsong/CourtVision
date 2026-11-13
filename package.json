@@ -11,6 +11,7 @@
     "test": "pnpm -r test",
     "test:web": "pnpm --filter @courtvision/web test",
     "test:api": "python -m pytest apps/api/tests",
+    "benchmark:live-api": "node scripts/benchmark-live-api.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm test"
   }
 }
