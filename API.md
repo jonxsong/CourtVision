@@ -12,8 +12,8 @@ The FastAPI service publishes OpenAPI at `/docs` and `/openapi.json`. Default ba
 | GET | `/api/v1/games` | Paginated schedule/results |
 | GET | `/api/v1/games/{id}` | Game, ordered events, leaders |
 | GET | `/api/v1/shots` | Shot dataset by player and season |
-| POST | `/api/v1/predictions/baseline` | Transparent, unvalidated demo probability |
-| POST | `/api/v1/insights/query` | Grounded demo retrieval response |
+| POST | `/api/v1/predictions/baseline` | Transparent, unvalidated baseline probability |
+| POST | `/api/v1/insights/query` | Grounded response using real NBA player metrics |
 | WS | `/api/v1/ws/games/{id}` | Snapshot, Redis fan-out, gap recovery, polling fallback, and replay |
 
 ## WebSocket protocol
@@ -29,19 +29,19 @@ List responses contain:
   "data": [],
   "meta": { "page": 1, "page_size": 24, "total": 0 },
   "provenance": {
-    "provider": "CourtVision deterministic fixtures",
-    "is_demo": true,
-    "fetched_at": "2026-11-12T00:00:00Z",
-    "note": "Synthetic teams, players, games, and events for product demonstration only."
+    "provider": "nba_stats",
+    "is_demo": false,
+    "fetched_at": "2026-11-13T04:19:43Z",
+    "note": "Real NBA roster and current-season statistics from the latest refresh."
   }
 }
 ```
 
 ## Errors
 
-Validation failures use FastAPI's 422 problem detail. Missing resources return 404. An adapter that is named but not configured fails application startup; it never falls back silently to demo data.
+Validation failures use FastAPI's 422 problem detail. Missing resources return 404. An adapter that is named but not configured fails application startup; it never falls back to invented records.
 
-When the free BALLDONTLIE adapter is active, `/players` and `/games` return real provider data with `is_demo: false`. Statistical player profiles, play-by-play, and shot charts that require a paid tier remain empty or explicitly unavailable; the API never substitutes fixture values into a real-provider response.
+The default `nba_snapshot` adapter serves the committed real NBA player, game, and shot snapshots without requiring a paid key. When the free BALLDONTLIE adapter is active, `/players` and `/games` return live provider data. Fields unavailable from a provider remain empty or explicitly unavailable; the API never substitutes invented values.
 
 ## Security contract
 

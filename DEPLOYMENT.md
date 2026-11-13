@@ -44,7 +44,7 @@ See `.env.example`. Browser-visible variables must never contain secrets. `NEXT_
 5. deploy API and verify readiness;
 6. deploy web;
 7. start workers;
-8. smoke-test demo/provider health and rollback if contracts fail.
+8. smoke-test provider health and rollback if contracts fail.
 
 ## Verified release checks
 

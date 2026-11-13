@@ -23,4 +23,4 @@ def test_same_lead_is_more_decisive_late():
 def test_baseline_is_explicitly_unvalidated():
     result = baseline_probability(vector(0, 2880))
     assert result.is_validated is False
-    assert "demo" in result.model
+    assert result.model == "transparent-baseline-v1"

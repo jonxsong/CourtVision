@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     live_poll_interval_seconds: float = Field(default=5.0, ge=0.1, le=60)
     websocket_heartbeat_seconds: float = Field(default=20.0, ge=1, le=120)
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
-    data_provider: Literal["demo", "balldontlie", "sportradar"] = "demo"
+    data_provider: Literal["nba_snapshot", "balldontlie", "sportradar"] = "nba_snapshot"
     balldontlie_api_key: str | None = None
     balldontlie_base_url: str = "https://api.balldontlie.io"
     provider_timeout_seconds: float = 20.0

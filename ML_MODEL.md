@@ -47,7 +47,7 @@ Each `MLModelVersion` records the training cutoff, feature schema, evaluation me
 
 ## Current baseline
 
-`services/win_probability.py` uses a bounded logistic expression over score differential, time remaining, possession proxy, and fictional strength inputs. It exists to test API/UI contracts and replay behavior only. There is no performance claim because no licensed historical corpus has been trained or evaluated.
+`services/win_probability.py` uses a bounded logistic expression over caller-supplied score differential, time remaining, possession proxy, and strength inputs. It exists to test API/UI contracts only. It does not consume invented NBA records, and there is no performance claim because no licensed historical corpus has been trained or evaluated.
 
 ## Training command
 

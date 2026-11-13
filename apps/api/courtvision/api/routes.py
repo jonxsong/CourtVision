@@ -76,16 +76,16 @@ async def predict_baseline(features: FeatureVector) -> WinProbability:
 
 @router.post("/insights/query", response_model=AnalystAnswer)
 async def query_analyst(question: AnalystQuestion, data: Provider) -> AnalystAnswer:
-    if not data.is_demo:
-        raise HTTPException(status_code=501, detail="Agent integration is not configured")
-    profile = await data.player(question.player_ids[0] if question.player_ids else "p-miles-avery", question.season)
+    if not question.player_ids:
+        raise HTTPException(status_code=422, detail="Select a real NBA player first")
+    profile = await data.player(question.player_ids[0], question.season)
     if not profile:
         raise HTTPException(status_code=404, detail="Requested context was not found")
     points = next(metric for metric in profile.metrics if metric.key == "ppg")
     efficiency = next(metric for metric in profile.metrics if metric.key == "ts")
     return AnalystAnswer(
         answer=(
-            f"In the deterministic demo dataset, {profile.name} combines a high scoring load "
+            f"In the current NBA snapshot, {profile.name} combines a scoring load "
             f"({points.value:.1f} points per game) with {efficiency.value:.1f}% true shooting."
         ),
         facts=[
@@ -94,6 +94,6 @@ async def query_analyst(question: AnalystQuestion, data: Provider) -> AnalystAns
         ],
         interpretation="The efficiency result appears to come from a strong rim and three-point profile; this is interpretation, not an observed causal claim.",
         season=profile.season,
-        is_demo=True,
-        limitations=["Synthetic fixture data", "No external model call", "Not representative of an NBA player"],
+        is_demo=False,
+        limitations=["Snapshot data can lag the live provider", "No causal claim is inferred"],
     )

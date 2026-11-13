@@ -46,19 +46,19 @@ def test_replay_cursor_returns_only_new_events():
 
 
 def test_websocket_snapshot_replay_and_heartbeat(client):
-    with client.websocket_connect("/api/v1/ws/games/game-orb-pin-001") as socket:
+    game_id = client.get("/api/v1/games").json()["data"][0]["id"]
+    with client.websocket_connect(f"/api/v1/ws/games/{game_id}") as socket:
         snapshot = socket.receive_json()
         assert snapshot["type"] == "snapshot"
-        assert snapshot["last_sequence"] == 11
-        assert snapshot["is_demo"] is True
+        assert snapshot["last_sequence"] == 0
+        assert snapshot["events"] == []
+        assert snapshot["is_demo"] is False
 
-        socket.send_json({"type": "replay", "after_sequence": 9})
-        assert socket.receive_json()["event"]["sequence"] == 10
-        assert socket.receive_json()["event"]["sequence"] == 11
-        assert socket.receive_json() == {"type": "replay_complete", "last_sequence": 11}
+        socket.send_json({"type": "replay", "after_sequence": 0})
+        assert socket.receive_json() == {"type": "replay_complete", "last_sequence": 0}
 
         socket.send_json({"type": "ping"})
-        assert socket.receive_json() == {"type": "pong", "last_sequence": 11}
+        assert socket.receive_json() == {"type": "pong", "last_sequence": 0}
 
 
 class OneEventBus:
@@ -84,29 +84,31 @@ class FailingEventBus:
             yield
 
 
-def published_event(sequence: int) -> PublishedGameEvent:
+def published_event(game_id: str, sequence: int) -> PublishedGameEvent:
     return PublishedGameEvent(
-        game_id="game-orb-pin-001",
+        game_id=game_id,
         event=event(f"live-{sequence}", sequence, "Live update"),
         published_at=datetime.now(UTC),
     )
 
 
 def test_websocket_forwards_contiguous_redis_event(client):
-    app.state.event_bus = OneEventBus(published_event(12))
+    game_id = client.get("/api/v1/games").json()["data"][0]["id"]
+    app.state.event_bus = OneEventBus(published_event(game_id, 1))
 
-    with client.websocket_connect("/api/v1/ws/games/game-orb-pin-001") as socket:
+    with client.websocket_connect(f"/api/v1/ws/games/{game_id}") as socket:
         assert socket.receive_json()["type"] == "snapshot"
         message = socket.receive_json()
 
         assert message["type"] == "event"
-        assert message["event"]["sequence"] == 12
+        assert message["event"]["sequence"] == 1
 
 
 def test_websocket_switches_to_polling_when_redis_is_unavailable(client):
+    game_id = client.get("/api/v1/games").json()["data"][0]["id"]
     app.state.event_bus = FailingEventBus()
 
-    with client.websocket_connect("/api/v1/ws/games/game-orb-pin-001") as socket:
+    with client.websocket_connect(f"/api/v1/ws/games/{game_id}") as socket:
         assert socket.receive_json()["type"] == "snapshot"
         message = socket.receive_json()
 
@@ -119,16 +121,17 @@ def test_websocket_switches_to_polling_when_redis_is_unavailable(client):
 
 
 def test_websocket_detects_sequence_gap_before_forwarding(client):
-    app.state.event_bus = OneEventBus(published_event(13))
+    game_id = client.get("/api/v1/games").json()["data"][0]["id"]
+    app.state.event_bus = OneEventBus(published_event(game_id, 2))
 
-    with client.websocket_connect("/api/v1/ws/games/game-orb-pin-001") as socket:
+    with client.websocket_connect(f"/api/v1/ws/games/{game_id}") as socket:
         assert socket.receive_json()["type"] == "snapshot"
         message = socket.receive_json()
 
         assert message == {
             "type": "gap",
-            "expected_sequence": 12,
-            "received_sequence": 13,
+            "expected_sequence": 1,
+            "received_sequence": 2,
             "transport": "polling",
             "recoverable": True,
         }

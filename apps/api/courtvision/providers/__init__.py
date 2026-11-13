@@ -1,12 +1,12 @@
 from courtvision.config import Settings
 from courtvision.providers.balldontlie import BallDontLieProvider
 from courtvision.providers.base import BasketballDataProvider
-from courtvision.providers.demo import DemoProvider
+from courtvision.providers.nba_snapshot import NBASnapshotProvider
 
 
 def create_provider(settings: Settings) -> BasketballDataProvider:
-    if settings.data_provider == "demo":
-        return DemoProvider()
+    if settings.data_provider == "nba_snapshot":
+        return NBASnapshotProvider()
     if settings.data_provider == "balldontlie":
         if not settings.balldontlie_api_key:
             raise RuntimeError(
@@ -20,7 +20,7 @@ def create_provider(settings: Settings) -> BasketballDataProvider:
         )
     raise RuntimeError(
         f"Provider '{settings.data_provider}' requires credentials and an enabled adapter. "
-        "Use COURTVISION_DATA_PROVIDER=demo until configured."
+        "Use COURTVISION_DATA_PROVIDER=nba_snapshot for the committed real-data snapshot."
     )
 
 

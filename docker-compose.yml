@@ -33,7 +33,7 @@ services:
       COURTVISION_DATABASE_URL: postgresql+asyncpg://courtvision:courtvision@postgres:5432/courtvision
       COURTVISION_REDIS_URL: redis://redis:6379/0
       COURTVISION_CORS_ORIGINS: '["http://localhost:3000"]'
-      COURTVISION_DATA_PROVIDER: demo
+      COURTVISION_DATA_PROVIDER: nba_snapshot
     ports:
       - "8000:8000"
     depends_on:

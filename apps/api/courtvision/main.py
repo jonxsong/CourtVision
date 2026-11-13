@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title="CourtVision API",
     version=__version__,
-    description="Typed basketball analytics API. Demo mode contains synthetic fixtures only.",
+    description="Typed basketball analytics API backed exclusively by real NBA data.",
     lifespan=lifespan,
 )
 app.add_middleware(
