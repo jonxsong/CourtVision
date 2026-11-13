@@ -16,7 +16,7 @@ const pipeline = [
   { icon: Gauge, label: "Rate guard", detail: "5 requests / minute" },
   { icon: ShieldCheck, label: "Normalize", detail: "Typed, validated records" },
   { icon: RefreshCw, label: "Upsert", detail: "Checksum + stable IDs" },
-  { icon: Database, label: "Serve", detail: "PostgreSQL → FastAPI" },
+  { icon: Database, label: "Serve", detail: "Sites Worker → browser" },
 ];
 
 const sources = [
@@ -38,7 +38,7 @@ export default function OperationsPage() {
       <section className="shell operations-status" aria-label="Connector status">
         <article><CheckCircle2 size={18} /><span>Connector</span><strong>Free feed ready</strong><p>Real players, teams, schedules, game state, and scores.</p></article>
         <article><ShieldCheck size={18} /><span>Safety rails</span><strong>25 backend tests</strong><p>Duplicate and reordered batches converge without duplicate rows.</p></article>
-        <article><LockKeyhole size={18} /><span>Public preview</span><strong>Demo fallback active</strong><p>Secrets stay server-side; fixtures remain labeled until runtime hosting is connected.</p></article>
+        <article><LockKeyhole size={18} /><span>Public runtime</span><strong>Live service online</strong><p>The hosted secret stays server-side behind a 60-second provider cache.</p></article>
       </section>
 
       <section className="content-section shell">
