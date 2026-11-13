@@ -111,3 +111,7 @@ async def test_json_client_honors_retry_after() -> None:
 
     assert payload == {"data": []}
     assert 0 in sleeps
+
+
+def test_provider_maps_in_progress_status_to_live() -> None:
+    assert BallDontLieProvider._game_status({"status_state": "in_progress"}) == "live"

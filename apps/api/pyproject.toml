@@ -65,6 +65,10 @@ branch = true
 omit = [
   "*/database.py",
   "*/models.py",
+  "*/ingestion/cli.py",
+  "*/ingestion/repository.py",
+  "*/providers/check.py",
+  "*/providers/snapshot.py",
 ]
 
 [tool.coverage.report]

@@ -9,6 +9,7 @@ export function Footer() {
         <p>See the game beyond the box score.</p>
       </div>
       <div className="footer-meta">
+        <Link href="/operations">Data operations</Link>
         <span>Built for transparent basketball analysis.</span>
         <span>Demo fixtures are synthetic and clearly labeled.</span>
       </div>

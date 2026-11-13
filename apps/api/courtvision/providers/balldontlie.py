@@ -1,5 +1,6 @@
 import re
 from datetime import UTC, datetime
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -113,7 +114,7 @@ class BallDontLieProvider(BasketballDataProvider):
         state = str(raw.get("status_state", raw.get("status", ""))).lower()
         if state in {"final", "closed"}:
             return "final"
-        if state in {"inprogress", "live"} or "qtr" in state or state == "halftime":
+        if state in {"inprogress", "in_progress", "live"} or "qtr" in state or state == "halftime":
             return "live"
         return "scheduled"
 
@@ -191,7 +192,10 @@ class BallDontLieProvider(BasketballDataProvider):
         )
 
     async def games(self, page: int, page_size: int) -> GamePage:
-        raw, total = await self._page("/v1/games", page=page, page_size=page_size)
+        today = datetime.now(ZoneInfo("America/New_York")).date().isoformat()
+        raw, total = await self._page(
+            "/v1/games", page=page, page_size=page_size, params={"dates[]": today}
+        )
         return GamePage(
             data=[self._game(game) for game in raw],
             meta=PageMeta(page=page, page_size=page_size, total=total),

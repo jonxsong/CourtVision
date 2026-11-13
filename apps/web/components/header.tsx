@@ -4,7 +4,7 @@ import { Search, Sparkles } from "lucide-react";
 
 const links = [
   ["Players", "/players"], ["Compare", "/compare"], ["Games", "/games"],
-  ["Shots", "/shots"], ["Insights", "/insights"]
+  ["Shots", "/shots"], ["Insights", "/insights"], ["Data", "/operations"]
 ];
 
 export function Header() {

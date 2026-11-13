@@ -26,7 +26,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="ticker" aria-label="Product status"><div className="shell ticker-inner"><span><i className="status-dot" /> Historical replay online</span><b>Deterministic fixtures · 2025–26 demonstration season</b><Link href="/games">View game slate <ChevronRight size={14} /></Link></div></section>
+      <section className="ticker" aria-label="Product status"><div className="shell ticker-inner"><span><i className="status-dot" /> Free live connector verified</span><b>Real NBA score snapshot + labeled replay fixtures</b><Link href="/operations">View data operations <ChevronRight size={14} /></Link></div></section>
 
       <section className="section shell">
         <div className="section-heading"><div><span className="kicker">01 · Player intelligence</span><h2>Who is shaping the game?</h2></div><Link href="/players">All players <ArrowRight size={16} /></Link></div>

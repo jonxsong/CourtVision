@@ -4,12 +4,13 @@ import type { Game } from "@/lib/types";
 import { DemoBadge } from "./demo-badge";
 import { TeamMark } from "./team-mark";
 
-export function GameCard({ game, compact = false }: { game: Game; compact?: boolean }) {
-  return (
-    <Link href={`/games/${game.id}`} className={compact ? "game-card compact" : "game-card"}>
+export function GameCard({ game, compact = false, source = "demo", linked = true }: { game: Game; compact?: boolean; source?: "demo" | "live"; linked?: boolean }) {
+  const className = compact ? "game-card compact" : "game-card";
+  const content = (
+    <>
       <div className="game-card-top">
-        <span>{game.status === "final" ? "Final" : "Scheduled"}</span>
-        <DemoBadge compact />
+        <span>{game.status === "final" ? "Final" : game.status === "live" ? "Live" : "Scheduled"}</span>
+        {source === "demo" ? <DemoBadge compact /> : <span className="live-data-badge"><i /> Live provider</span>}
       </div>
       <div className="matchup">
         <div><TeamMark team={game.away.team} size={compact ? "sm" : "md"} /><span><b>{game.away.team.city}</b><small>{game.away.record}</small></span></div>
@@ -20,6 +21,7 @@ export function GameCard({ game, compact = false }: { game: Game; compact?: bool
         <strong>{game.status === "scheduled" ? "—" : game.home.score}</strong>
       </div>
       {!compact && <div className="game-card-bottom"><span>{game.headline}</span><ArrowUpRight size={16} /></div>}
-    </Link>
+    </>
   );
+  return linked ? <Link href={`/games/${game.id}`} className={className}>{content}</Link> : <article className={className}>{content}</article>;
 }

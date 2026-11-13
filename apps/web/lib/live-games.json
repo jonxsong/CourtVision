@@ -1,0 +1,119 @@
+{
+  "provider": "balldontlie",
+  "fetchedAt": "2026-11-13T02:13:45.823115+00:00",
+  "gameDate": "2026-11-12",
+  "games": [
+    {
+      "id": "21718091",
+      "tipoffAt": "2026-11-13T00:00:00+00:00",
+      "status": "live",
+      "home": {
+        "team": {
+          "id": "23",
+          "abbreviation": "PHI",
+          "city": "Philadelphia",
+          "name": "76ers"
+        },
+        "score": 111,
+        "record": "\u2014"
+      },
+      "away": {
+        "team": {
+          "id": "28",
+          "abbreviation": "TOR",
+          "city": "Toronto",
+          "name": "Raptors"
+        },
+        "score": 102,
+        "record": "\u2014"
+      },
+      "venue": "Venue unavailable",
+      "headline": "TOR at PHI \u00b7 4th Qtr",
+      "isDemo": false
+    },
+    {
+      "id": "21718092",
+      "tipoffAt": "2026-11-13T00:00:00+00:00",
+      "status": "live",
+      "home": {
+        "team": {
+          "id": "30",
+          "abbreviation": "WAS",
+          "city": "Washington",
+          "name": "Wizards"
+        },
+        "score": 106,
+        "record": "\u2014"
+      },
+      "away": {
+        "team": {
+          "id": "9",
+          "abbreviation": "DET",
+          "city": "Detroit",
+          "name": "Pistons"
+        },
+        "score": 110,
+        "record": "\u2014"
+      },
+      "venue": "Venue unavailable",
+      "headline": "DET at WAS \u00b7 4th Qtr",
+      "isDemo": false
+    },
+    {
+      "id": "21718093",
+      "tipoffAt": "2026-11-13T01:00:00+00:00",
+      "status": "live",
+      "home": {
+        "team": {
+          "id": "18",
+          "abbreviation": "MIN",
+          "city": "Minnesota",
+          "name": "Timberwolves"
+        },
+        "score": 67,
+        "record": "\u2014"
+      },
+      "away": {
+        "team": {
+          "id": "7",
+          "abbreviation": "DAL",
+          "city": "Dallas",
+          "name": "Mavericks"
+        },
+        "score": 52,
+        "record": "\u2014"
+      },
+      "venue": "Venue unavailable",
+      "headline": "DAL at MIN \u00b7 2nd Qtr",
+      "isDemo": false
+    },
+    {
+      "id": "21718094",
+      "tipoffAt": "2026-11-13T02:00:00+00:00",
+      "status": "live",
+      "home": {
+        "team": {
+          "id": "24",
+          "abbreviation": "PHX",
+          "city": "Phoenix",
+          "name": "Suns"
+        },
+        "score": 5,
+        "record": "\u2014"
+      },
+      "away": {
+        "team": {
+          "id": "4",
+          "abbreviation": "CHA",
+          "city": "Charlotte",
+          "name": "Hornets"
+        },
+        "score": 4,
+        "record": "\u2014"
+      },
+      "venue": "Venue unavailable",
+      "headline": "CHA at PHX \u00b7 1st Qtr",
+      "isDemo": false
+    }
+  ]
+}
