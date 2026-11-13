@@ -5,7 +5,7 @@
   "packageManager": "pnpm@11.25.0",
   "scripts": {
     "dev": "pnpm --filter @courtvision/web dev",
-    "build": "pnpm --filter @courtvision/web build",
+    "build": "pnpm --filter @courtvision/web build && node scripts/prepare-sites-output.mjs",
     "lint": "pnpm --filter @courtvision/web lint",
     "typecheck": "pnpm --filter @courtvision/web typecheck",
     "test": "pnpm -r test",
