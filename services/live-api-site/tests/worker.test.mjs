@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import worker, { easternDate, gameStatus } from "../worker/index.js";
+import worker, { currentSeason, easternDate, gameStatus, normalizeShot, resetCachesForTest } from "../worker/index.js";
 
 const MAIN_ORIGIN = "https://courtvision-analytics.perkyaisle4.chatgpt.site";
 
+test.beforeEach(() => resetCachesForTest());
+
 test("normalizes Eastern game day and live states", () => {
   assert.equal(easternDate(new Date("2026-11-13T02:00:00Z")), "2026-11-12");
+  assert.equal(currentSeason(new Date("2026-11-13T02:00:00Z")), "2026-27");
   assert.equal(gameStatus({ status_state: "in_progress" }), "live");
   assert.equal(gameStatus({ status_state: "final" }), "final");
 });
@@ -23,7 +26,68 @@ test("serves an operational status page at the site root", async () => {
   assert.match(response.headers.get("content-type"), /^text\/html/);
   assert.match(page, /Service online/);
   assert.match(page, /href="\/api\/games"/);
+  assert.match(page, /href="\/api\/players"/);
   assert.match(page, /courtvision-analytics\.perkyaisle4\.chatgpt\.site\/games/);
+});
+
+test("serves active NBA players with real base and advanced statistics", async () => {
+  const calls = [];
+  globalThis.fetch = async (input) => {
+    const url = new URL(input);
+    calls.push(url);
+    if (url.pathname === "/stats/playerindex") {
+      return Response.json({ resultSets: [{
+        headers: ["PERSON_ID", "PLAYER_LAST_NAME", "PLAYER_FIRST_NAME", "PLAYER_SLUG", "TEAM_ID", "TEAM_CITY", "TEAM_NAME", "TEAM_ABBREVIATION", "JERSEY_NUMBER", "POSITION", "HEIGHT", "WEIGHT", "COLLEGE", "COUNTRY", "DRAFT_YEAR", "DRAFT_ROUND", "DRAFT_NUMBER", "ROSTER_STATUS"],
+        rowSet: [[2544, "James", "LeBron", "lebron-james", 1610612755, "Philadelphia", "76ers", "PHI", "23", "F", "6-9", "250", "St. Vincent-St. Mary HS", "USA", 2003, 1, 1, 1]],
+      }] });
+    }
+    const advanced = url.searchParams.get("MeasureType") === "Advanced";
+    return Response.json({ resultSets: [{
+      headers: advanced
+        ? ["PLAYER_ID", "TS_PCT", "EFG_PCT", "USG_PCT", "AST_PCT", "REB_PCT", "NET_RATING", "OFF_RATING", "DEF_RATING", "PACE", "PIE"]
+        : ["PLAYER_ID", "PLAYER_NAME", "TEAM_ID", "TEAM_ABBREVIATION", "GP", "MIN", "PTS", "REB", "AST", "STL", "BLK", "TOV", "FG_PCT", "FG3_PCT", "FT_PCT", "PLUS_MINUS"],
+      rowSet: advanced
+        ? [[2544, 0.612, 0.574, 0.281, 0.338, 0.091, 6.2, 119.4, 113.2, 99.8, 0.164]]
+        : [[2544, "LeBron James", 1610612755, "PHI", 8, 34.2, 24.5, 7.8, 8.1, 1.2, 0.7, 3.4, 0.52, 0.36, 0.78, 5.1]],
+    }] });
+  };
+
+  const response = await worker.fetch(new Request("https://api.test/api/players", { headers: { origin: MAIN_ORIGIN } }), {}, { waitUntil() {} });
+  const payload = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(payload.provider, "nba_stats");
+  assert.equal(payload.players[0].name, "LeBron James");
+  assert.equal(payload.players[0].position, "F");
+  assert.equal(payload.players[0].stats.points, 24.5);
+  assert.equal(payload.players[0].stats.trueShootingPct, 0.612);
+  assert.equal(calls.length, 3);
+});
+
+test("serves real NBA shot coordinates in court feet", async () => {
+  globalThis.fetch = async (input) => {
+    const url = new URL(input);
+    assert.equal(url.pathname, "/stats/shotchartdetail");
+    assert.equal(url.searchParams.get("PlayerID"), "2544");
+    return Response.json({ resultSets: [{
+      headers: ["GAME_ID", "GAME_EVENT_ID", "PLAYER_ID", "PLAYER_NAME", "PERIOD", "MINUTES_REMAINING", "SECONDS_REMAINING", "ACTION_TYPE", "SHOT_TYPE", "SHOT_ZONE_BASIC", "SHOT_DISTANCE", "LOC_X", "LOC_Y", "SHOT_MADE_FLAG", "GAME_DATE"],
+      rowSet: [["0022600002", 29, 2544, "LeBron James", 1, 9, 35, "Jump Shot", "3PT Field Goal", "Right Corner 3", 23, 239, -5, 0, "20261020"]],
+    }] });
+  };
+  const response = await worker.fetch(new Request("https://api.test/api/shots?player_id=2544&season=2026-27", { headers: { origin: MAIN_ORIGIN } }), {}, { waitUntil() {} });
+  const payload = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(payload.shots[0].x, 23.9);
+  assert.equal(payload.shots[0].y, 2);
+  assert.equal(payload.shots[0].points, 3);
+  assert.equal(payload.shots[0].zone, "Three");
+  assert.deepEqual(normalizeShot({ GAME_ID: "1", GAME_EVENT_ID: 2, PLAYER_ID: 3, PLAYER_NAME: "A", SHOT_TYPE: "2PT Field Goal", SHOT_ZONE_BASIC: "Restricted Area", LOC_X: 0, LOC_Y: 0, SHOT_MADE_FLAG: 1 }).zone, "Rim");
+});
+
+test("validates shot chart query parameters", async () => {
+  const response = await worker.fetch(new Request("https://api.test/api/shots", { headers: { origin: MAIN_ORIGIN } }), {}, { waitUntil() {} });
+  assert.equal(response.status, 400);
 });
 
 test("serves a cached browser-safe live slate", async () => {
