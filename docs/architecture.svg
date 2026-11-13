@@ -10,7 +10,7 @@
   </defs>
   <rect class="bg" width="1400" height="820"/>
   <text x="65" y="65" class="label">COURTVISION · SYSTEM MAP</text>
-  <text x="65" y="98" class="sub">Replaceable providers. One normalized event model. Transparent intelligence.</text>
+  <text x="65" y="98" class="sub">Public edge delivery. Replaceable providers. Grounded basketball intelligence.</text>
 
   <g filter="url(#rough)">
     <rect x="65" y="150" width="250" height="165" rx="8" class="accent"/>
@@ -73,9 +73,9 @@
     <path d="M1200 475 C1180 400 900 380 700 315" class="mutedArrow"/>
   </g>
 
-  <text x="65" y="735" class="tiny">LIVE PATH</text>
+  <text x="65" y="735" class="tiny">PUBLIC PATH</text>
   <path d="M145 730 L255 730" class="arrow"/>
-  <text x="285" y="735" class="sub">Provider → ingestion → Postgres → Redis → WebSocket → client</text>
+  <text x="285" y="735" class="sub">NBA feeds → versioned snapshots / Worker → Next.js client → Ask CV</text>
   <text x="65" y="780" class="tiny">RULE</text>
-  <text x="115" y="780" class="sub">Historical replay and live updates share the same ordered, idempotent event contract.</text>
+  <text x="115" y="780" class="sub">Secrets stay server-side; unavailable upstream values remain unavailable rather than being invented.</text>
 </svg>

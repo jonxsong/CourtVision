@@ -21,9 +21,9 @@
 
 ---
 
-CourtVision is not a generic stats dashboard and it does not manufacture NBA data. It is a full-stack basketball intelligence product built around transparent provenance, real NBA player statistics, observed shot coordinates, current game state, and a premium editorial interface. Missing upstream values remain unavailable instead of being estimated.
+CourtVision is not a generic stats dashboard and it does not manufacture NBA data. It is a full-stack basketball intelligence product built around transparent provenance, real NBA player statistics, observed shot coordinates, current game state, grounded AI research, and a premium editorial interface. Missing upstream values remain unavailable instead of being estimated.
 
-The public `.chatgpt.site` deployment combines a static Next.js experience with a server-side data Worker. BALLDONTLIE supplies the current slate and scores. NBA Stats-compatible endpoints supply active rosters, base and advanced player metrics, and shot locations; versioned snapshots keep those surfaces available when NBA Stats blocks cloud egress.
+The public `.chatgpt.site` deployment combines a static Next.js experience with a server-side data Worker. BALLDONTLIE supplies the current slate and scores. NBA Stats-compatible endpoints supply active rosters, base and advanced player metrics, and shot locations; versioned snapshots keep those surfaces available when NBA Stats blocks cloud egress. Ask CV uses the OpenAI Responses API to answer questions through bounded, read-only tools over those same NBA sources.
 
 ![CourtVision architecture](docs/architecture.svg)
 
@@ -63,6 +63,8 @@ CourtVision treats basketball as a connected event system:
 - Game Intelligence exposes the real schedule, score, status, venue, and tipoff available from the free provider; it does not fabricate missing play-by-play.
 - Shot Explorer renders observed NBA shot coordinates and per-zone efficiency for every player with current-season attempts.
 - Ask CourtVision is a conversational research assistant grounded in typed, read-only NBA tools. Current factual claims cite the underlying CourtVision source.
+
+Ask CV currently covers the player, comparison, league-leader, game, and shot-profile data exposed by CourtVision. It does not claim unsupported injury, transaction, historical, or play-by-play knowledge.
 
 ## Start locally
 

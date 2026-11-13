@@ -57,9 +57,9 @@ Status as of November 12, 2026.
 
 - [x] grounded answer UX and fact/interpretation separation
 - [x] no-generated-SQL architecture decision
-- [ ] typed statistical retrieval package
+- [x] typed statistical retrieval tools for players, comparisons, leaders, games, and shot profiles
 - [ ] MCP server
-- [ ] OpenAI Agents SDK orchestration
+- [x] OpenAI Responses API tool orchestration
 - [ ] Redis-backed rate limits and timeouts
 - [ ] OpenTelemetry export
 - [x] Lighthouse accessibility, best-practices, SEO, and CLS audit on optimized static build

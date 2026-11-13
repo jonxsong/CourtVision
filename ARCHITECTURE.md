@@ -1,6 +1,6 @@
 # Architecture
 
-CourtVision is a modular monolith: one web application, one API application, one relational database, and Redis for transient coordination. This keeps operational complexity proportional to a solo-developed product while preserving replaceable boundaries around data providers, analytics, and AI.
+CourtVision has two deliberately compatible runtime shapes. The public product is a static Next.js application backed by a server-side Worker for live NBA data and Ask CV. The full development stack remains a modular monolith with FastAPI, PostgreSQL, and Redis for ingestion, persistence, replay, and real-time coordination. Both paths share provider-neutral contracts and preserve replaceable boundaries around data, analytics, and AI.
 
 ![System architecture](docs/architecture.svg)
 
@@ -12,7 +12,7 @@ flowchart LR
     N[NBA Stats / nba_api] --> S[Snapshot refresh]
     S --> W
     S --> WEB[Next.js static assets]
-    W --> WEB
+    WEB <--> W
     O[OpenAI Responses API] <--> W
     P[Optional licensed provider] --> I[Ingestion worker]
     I --> V[Validation + normalization]
@@ -26,7 +26,7 @@ flowchart LR
     ML --> A[Versioned artifacts]
     A --> API
     W --> T[Read-only NBA tools]
-    T --> O
+    T --> S
 ```
 
 ## Boundaries
@@ -57,7 +57,7 @@ The Worker is the only component allowed to read the OpenAI secret. It exposes a
 
 ### Persistence
 
-PostgreSQL is the source of truth. Redis is not authoritative: it carries event notifications, caches computed views, and stores bounded live snapshots. A reconnecting client obtains a database-backed snapshot before consuming events after the snapshot sequence.
+PostgreSQL is the source of truth in the full ingestion stack. The public edge deployment serves versioned NBA snapshots as its last-known-good store while attempting fresher provider reads through the Worker. Redis is never authoritative: it carries event notifications, caches computed views, and stores bounded live snapshots. A reconnecting client obtains a database-backed snapshot before consuming events after the snapshot sequence.
 
 ## Event invariants
 
@@ -81,6 +81,7 @@ PostgreSQL is the source of truth. Redis is not authoritative: it carries event 
 | Public data | Real NBA feeds + versioned snapshots | Useful no-cost product with graceful cloud-block fallback |
 | ML split | Chronological | Prevents future information leaking backward |
 | AI access | Responses API + typed read-only tools | Grounds current claims and prevents arbitrary generated SQL |
+| Public AI boundary | Server-side Worker | Keeps OpenAI credentials out of the browser and applies validation, no-store responses, and bounded usage |
 
 ## Failure behavior
 
@@ -88,7 +89,7 @@ PostgreSQL is the source of truth. Redis is not authoritative: it carries event 
 - Redis unavailable: historical API remains available; live views fall back to polling.
 - WebSocket gap: client requests a snapshot and resumes after its sequence.
 - Coordinates unavailable: shot surface renders an explicit unavailable state.
-- AI unavailable: statistical pages remain fully functional; no fabricated prose is substituted.
+- AI unavailable: statistical pages remain fully functional; Ask CV shows an explicit unavailable state and no fabricated prose is substituted.
 
 ## Next architecture milestones
 
