@@ -55,3 +55,7 @@ The default `nba_snapshot` adapter serves the committed real NBA player, game, a
 ## Versioning
 
 Breaking response changes require a new URL version. Additive fields may be introduced within `v1`. Provider-specific fields belong in internal/raw payloads, not public response schemas.
+
+## Public Worker endpoints
+
+The hosted Worker publishes browser-safe `GET /api/games`, `GET /api/players`, and `GET /api/shots` routes plus `POST /api/ask`. Ask CV accepts a question and up to eight recent user/assistant messages, keeps responses `no-store`, and returns an answer with the NBA sources used by its read-only tools. OpenAI and provider secrets remain server-side.

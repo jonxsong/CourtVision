@@ -13,6 +13,7 @@ flowchart LR
     S --> W
     S --> WEB[Next.js static assets]
     W --> WEB
+    O[OpenAI Responses API] <--> W
     P[Optional licensed provider] --> I[Ingestion worker]
     I --> V[Validation + normalization]
     V --> PG[(PostgreSQL)]
@@ -24,15 +25,15 @@ flowchart LR
     PG --> ML[Training pipeline]
     ML --> A[Versioned artifacts]
     A --> API
-    API --> T[Read-only statistical tools]
-    T --> AG[Agents SDK / MCP]
+    W --> T[Read-only NBA tools]
+    T --> O
 ```
 
 ## Boundaries
 
 ### Web application
 
-`apps/web` owns presentation, URL state, client interactions, and visualization. It never receives provider credentials. Real current-season player and shot snapshots are bundled as static assets, with live Worker requests attempted first and snapshot fallback after a strict timeout.
+`apps/web` owns presentation, URL state, client interactions, visualization, and the Ask CV conversation UI. It never receives provider or OpenAI credentials. Real current-season player and shot snapshots are bundled as static assets, with live Worker requests attempted first and snapshot fallback after a strict timeout.
 
 ### API application
 
@@ -49,6 +50,10 @@ flowchart LR
 5. support idempotent upserts and resumable cursors.
 
 The public Worker uses BALLDONTLIE for games and NBA Stats-compatible endpoints for player and shot data. NBA Stats calls are sequential, time-bounded, and cached because simultaneous or cloud-origin calls can stall. The broader FastAPI provider boundary remains available for licensed integrations.
+
+### Ask CV boundary
+
+The Worker is the only component allowed to read the OpenAI secret. It exposes a bounded `POST /api/ask` endpoint, validates conversation input, and executes typed read-only tools for player lookup, comparisons, league leaders, live games, and shot profiles. OpenAI writes the response after tool retrieval; browser code receives only the answer, source labels, season, and model metadata.
 
 ### Persistence
 
@@ -75,7 +80,7 @@ PostgreSQL is the source of truth. Redis is not authoritative: it carries event 
 | Visualization | Native SVG/D3 + Recharts | Custom court geometry and standard charts |
 | Public data | Real NBA feeds + versioned snapshots | Useful no-cost product with graceful cloud-block fallback |
 | ML split | Chronological | Prevents future information leaking backward |
-| AI access | Typed read-only tools | Prevents arbitrary generated SQL |
+| AI access | Responses API + typed read-only tools | Grounds current claims and prevents arbitrary generated SQL |
 
 ## Failure behavior
 

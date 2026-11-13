@@ -5,7 +5,7 @@
 - UI: `https://courtvision-analytics.perkyaisle4.chatgpt.site`
 - Live data Worker: `https://courtvision-live-data.perkyaisle4.chatgpt.site`
 
-The UI is a static Next.js export that hydrates a small live-score component. The Worker owns the BALLDONTLIE credential, normalizes the public response, permits the CourtVision origin, coalesces concurrent refreshes, caches successful data for 60 seconds, and serves the last-known-good payload when the provider fails.
+The UI is a static Next.js export that hydrates live data and Ask CV client components. The Worker owns the BALLDONTLIE and OpenAI credentials, normalizes public responses, permits the CourtVision origin, coalesces concurrent refreshes, caches successful NBA data, and serves the last-known-good payload when a data provider fails. Ask CV responses are private/no-store and are never cached by the browser or CDN.
 
 The development topology uses four containers: web, API, PostgreSQL, and Redis. The live-score path is deployed and production-verified; the complete container topology is not yet a production deployment claim.
 
@@ -34,6 +34,8 @@ docker compose ps
 ## Environment variables
 
 See `.env.example`. Browser-visible variables must never contain secrets. `NEXT_PUBLIC_API_URL` is safe because it contains only a public service URL.
+
+Hosted Worker secrets are configured as `COURTVISION_BALLDONTLIE_API_KEY` and `COURTVISION_OPENAI_API_KEY`. Neither value belongs in source, the static export, or `.openai/hosting.json`.
 
 ## Release order
 

@@ -12,7 +12,7 @@
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
 [![CI](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml/badge.svg)](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-42_passing-66c78f?style=flat-square)](#verification)
+[![Tests](https://img.shields.io/badge/tests-45_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/data-real_NBA-168fa3?style=flat-square)](DATA_SOURCES.md)
 
 ### [Launch the public CourtVision experience →](https://courtvision-analytics.perkyaisle4.chatgpt.site)
@@ -38,18 +38,18 @@ The public `.chatgpt.site` deployment combines a static Next.js experience with 
 | `/games` | Current NBA game slate and scores | ✅ |
 | `/games/live?game=` | Clickable matchup detail with real game state | ✅ |
 | `/shots` | Real NBA shot coordinates on an interactive SVG court | ✅ |
-| `/insights` | Current-player statistical analysis with fact/interpretation separation | ✅ |
+| `/insights` | Ask CV conversational NBA research with grounded tool calls and citations | ✅ public |
 | `/operations` | Provider, ingestion, rights, and secret-handling status | ✅ |
 | FastAPI | Typed players, games, shots, replay, and baseline endpoints | ✅ |
 | PostgreSQL | Normalized schema and initial Alembic migration | ✅ |
 | BALLDONTLIE adapter | Free players, teams, schedules, game state, and scores | ✅ verified |
 | NBA Stats snapshot pipeline | 523 players and 30,414 current-season shots | ✅ public |
-| Live data Worker | Hosted secret, CORS boundary, caches, real-data fallback | ✅ public |
+| Live data Worker | Hosted secrets, CORS boundary, caches, real-data fallback, Ask CV tools | ✅ public |
 | Idempotent ingestion | Checksummed jobs, provenance, stable event upserts | ✅ |
 | Redis/live event fan-out | Versioned Pub/Sub, sequence-gap recovery, polling fallback | ✅ |
 | ML | Chronological training pipeline; no public prediction without validation | research only |
 | Trained XGBoost + calibration | Needs licensed historical play-by-play corpus | blocked by data |
-| OpenAI Agents + MCP | Typed tool boundary designed; production integration | planned |
+| OpenAI Responses API | Grounded player, leader, game, comparison, and shot-profile tools | ✅ public |
 
 > [!IMPORTANT]
 > CourtVision's public experience contains only real NBA records. Player and shot snapshots are refreshed from NBA Stats and are used as last-known-good data when the hosted Worker cannot reach the upstream endpoint. The site does not substitute synthetic players, shots, or metrics.
@@ -62,7 +62,7 @@ CourtVision treats basketball as a connected event system:
 - Comparison Lab keeps season, pace, sample size, and normalization visible.
 - Game Intelligence exposes the real schedule, score, status, venue, and tipoff available from the free provider; it does not fabricate missing play-by-play.
 - Shot Explorer renders observed NBA shot coordinates and per-zone efficiency for every player with current-season attempts.
-- Ask CourtVision is a statistical research interface—not an unrestricted SQL or chat surface.
+- Ask CourtVision is a conversational research assistant grounded in typed, read-only NBA tools. Current factual claims cite the underlying CourtVision source.
 
 ## Start locally
 
@@ -109,7 +109,7 @@ CourtVision/
 ├── apps/
 │   ├── web/                 # Next.js App Router product UI
 │   └── api/                 # FastAPI, providers, models, migrations
-├── services/live-api-site/  # Public games, players, shots, and snapshot Worker
+├── services/live-api-site/  # Public NBA data and grounded Ask CV Worker
 ├── docs/                    # Rendered/editable architecture assets
 ├── .github/workflows/       # CI checks
 ├── docker-compose.yml       # Web + API + PostgreSQL + Redis
@@ -132,7 +132,7 @@ Current local checkpoint:
 - TypeScript strict check: pass
 - Vitest: 1 test passes
 - Pytest: 33 tests pass
-- Live Worker: 8 tests pass
+- Live Worker: 11 tests pass
 - Critical backend business-logic coverage: 83% (branch coverage enabled; declarative ORM, command entrypoints, and DB wiring excluded)
 - Ruff: pass
 - mypy strict: pass

@@ -1,41 +1,97 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
-import { displayNumber, displayPercent } from "@/lib/live-data";
-import { useLivePlayers } from "@/lib/use-live-players";
+import { ArrowUp, Bot, LoaderCircle, RotateCcw, Sparkles, UserRound } from "lucide-react";
+import { type FormEvent, useMemo, useRef, useState } from "react";
+import { askCourtVision, type AskHistoryMessage } from "@/lib/live-data";
+
+type ChatMessage = AskHistoryMessage & {
+  id: string;
+  sources?: string[];
+  error?: boolean;
+};
+
+const SUGGESTIONS = [
+  "Compare Luka Dončić and Shai Gilgeous-Alexander this season.",
+  "Who are the NBA scoring leaders right now?",
+  "Break down Stephen Curry's shot profile.",
+  "What does true shooting percentage tell us?",
+];
+
+function messageId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random()}`;
+}
+
+function displayAnswer(value: string) {
+  return value.replace(/\*\*/g, "").replace(/^#{1,6}\s+/gm, "");
+}
 
 export function InsightTerminal() {
-  const { data, players, loading, error } = useLivePlayers();
-  const [playerId, setPlayerId] = useState("");
-  const [analyzed, setAnalyzed] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [question, setQuestion] = useState("");
+  const [pending, setPending] = useState(false);
+  const controller = useRef<AbortController | null>(null);
+  const history = useMemo<AskHistoryMessage[]>(
+    () => messages.filter((message) => !message.error).map(({ role, content }) => ({ role, content })),
+    [messages],
+  );
 
-  useEffect(() => {
-    if (!playerId && players.length) setPlayerId(players[0].id);
-  }, [playerId, players]);
+  async function submitQuestion(event?: FormEvent) {
+    event?.preventDefault();
+    const prompt = question.trim();
+    if (!prompt || pending) return;
+    const userMessage: ChatMessage = { id: messageId(), role: "user", content: prompt };
+    setMessages((current) => [...current, userMessage]);
+    setQuestion("");
+    setPending(true);
+    controller.current = new AbortController();
+    try {
+      const result = await askCourtVision(prompt, history, controller.current.signal);
+      setMessages((current) => [...current, {
+        id: messageId(), role: "assistant", content: result.answer, sources: result.sources,
+      }]);
+    } catch (reason) {
+      const message = reason instanceof Error ? reason.message : "Ask CV could not answer right now.";
+      setMessages((current) => [...current, {
+        id: messageId(), role: "assistant", content: message, error: true,
+      }]);
+    } finally {
+      setPending(false);
+      controller.current = null;
+    }
+  }
 
-  const player = players.find((item) => item.id === playerId);
-  if (loading) return <div className="empty-state"><div><h2>Loading NBA research data…</h2></div></div>;
-  if (error || !player) return <div className="empty-state"><div><h2>Research data is unavailable.</h2><p>{error ?? "No active NBA player was returned."}</p></div></div>;
+  function resetChat() {
+    controller.current?.abort();
+    setPending(false);
+    setMessages([]);
+    setQuestion("");
+  }
 
-  const scoringRead = player.stats.trueShootingPct === null
-    ? "Advanced efficiency is unavailable from the upstream response."
-    : player.stats.trueShootingPct >= 0.6
-      ? "The current scoring profile combines volume with above-threshold true-shooting efficiency."
-      : "The current scoring profile should be evaluated alongside role, shot mix, and team context.";
+  return <div className="insight-terminal ask-terminal">
+    <div className="terminal-head">
+      <span><Sparkles size={16} /> Ask CV · grounded NBA research</span>
+      <div className="terminal-actions"><span className="live-data-badge"><i /> NBA data connected</span>{messages.length > 0 && <button type="button" onClick={resetChat}><RotateCcw size={13} /> New chat</button>}</div>
+    </div>
 
-  return <div className="insight-terminal">
-    <div className="terminal-head"><span><Sparkles size={16} /> NBA research workspace</span><span className="live-data-badge"><i /> NBA Stats</span></div>
-    {!analyzed ? <div className="terminal-empty"><div className="insight-glyph"><Sparkles size={35} /></div><h2>Inspect a real player profile.</h2><p>Select any active NBA player. CourtVision will retrieve current-season facts and keep its descriptive interpretation visibly separate.</p></div> : <article className="answer-card">
-      <div className="answer-label"><Sparkles size={15} /> CourtVision analysis · {data?.season}</div>
-      <h2>{player.name}: current-season statistical read</h2>
-      <p><strong>Retrieved facts:</strong> {player.name} is averaging <strong>{displayNumber(player.stats.points)} points</strong>, <strong>{displayNumber(player.stats.rebounds)} rebounds</strong>, and <strong>{displayNumber(player.stats.assists)} assists</strong> through {player.stats.gamesPlayed} games.</p>
-      <div className="fact-grid"><div><small>Points per game</small><b>{displayNumber(player.stats.points)}</b><span>{player.stats.gamesPlayed}-game sample</span></div><div><small>True shooting</small><b>{displayPercent(player.stats.trueShootingPct)}</b><span>NBA Stats advanced</span></div><div><small>Net rating</small><b>{displayNumber(player.stats.netRating)}</b><span>Per 100 possessions</span></div></div>
-      <div className="interpretation"><small>Interpretation</small><p>{scoringRead} This is descriptive, not a causal claim or player ranking.</p></div>
-      <div className="limitations"><strong>Limitations</strong><span>Current regular season · Team and role context not adjusted · Missing values remain unavailable</span></div>
-      <Link className="text-link" href={`/players/live?player=${player.id}`}>Open complete player profile <ArrowRight size={15} /></Link>
-    </article>}
-    <form onSubmit={(event) => { event.preventDefault(); setAnalyzed(true); }} className="question-box"><label className="sr-only" htmlFor="insight-player">NBA player</label><select id="insight-player" value={playerId} onChange={(event) => { setPlayerId(event.target.value); setAnalyzed(false); }}>{players.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.team.abbreviation}</option>)}</select><button aria-label="Analyze player"><ArrowRight size={18} /></button><small>Real current-season retrieval · no generated statistics</small></form>
+    <div className="chat-scroll" aria-live="polite">
+      {messages.length === 0 ? <div className="terminal-empty">
+        <div className="insight-glyph"><Sparkles size={35} /></div>
+        <h2>Ask anything about the NBA.</h2>
+        <p>Ask CV can research current players, compare production, inspect shot profiles, explain metrics, and read today&apos;s game slate. Current facts are retrieved from CourtVision tools before the answer is written.</p>
+        <div className="prompt-chips">{SUGGESTIONS.map((suggestion) => <button key={suggestion} type="button" onClick={() => setQuestion(suggestion)}>{suggestion}</button>)}</div>
+      </div> : <div className="chat-thread">{messages.map((message) => <article key={message.id} className={`chat-message ${message.role}${message.error ? " error" : ""}`}>
+        <div className="chat-avatar">{message.role === "assistant" ? <Bot size={17} /> : <UserRound size={17} />}</div>
+        <div><small>{message.role === "assistant" ? "Ask CV" : "You"}</small><p>{message.role === "assistant" ? displayAnswer(message.content) : message.content}</p>{message.sources && message.sources.length > 0 && <div className="source-chips">{message.sources.map((source) => <span key={source}>{source}</span>)}</div>}</div>
+      </article>)}{pending && <article className="chat-message assistant"><div className="chat-avatar"><LoaderCircle className="spin" size={17} /></div><div><small>Ask CV</small><p>Retrieving CourtVision data and checking the numbers…</p></div></article>}</div>}
+    </div>
+
+    <form onSubmit={submitQuestion} className="question-box chat-composer">
+      <label className="sr-only" htmlFor="ask-cv-question">Ask an NBA question</label>
+      <textarea id="ask-cv-question" value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void submitQuestion(); } }} placeholder="Ask about a player, matchup, stat, shot profile, or tonight's games…" maxLength={500} disabled={pending} />
+      <button aria-label="Send question" disabled={pending || question.trim().length < 2}>{pending ? <LoaderCircle className="spin" size={18} /> : <ArrowUp size={18} />}</button>
+      <small>Powered by OpenAI · grounded in CourtVision NBA tools · current facts are cited</small>
+    </form>
   </div>;
 }

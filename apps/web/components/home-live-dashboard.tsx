@@ -62,6 +62,6 @@ export function HomeLiveDashboard({ initialGames }: { initialGames: LiveGamesPay
       {gamesData.games.length ? <div className="games-grid">{gamesData.games.slice(0, 3).map((game) => <GameCard game={game} key={game.id} />)}</div> : <div className="empty-state"><div><h2>No games on today&apos;s slate.</h2><p>Check back on the next NBA game day.</p></div></div>}
     </section>
 
-    <section className="insight-cta shell"><div className="orbital-mark"><ScanSearch size={55} /><i /><i /></div><div><span className="kicker">Ask CourtVision</span><h2>Your question.<br />The numbers behind it.</h2><p>Explore real NBA player profiles while keeping retrieved facts separate from interpretation.</p></div><Link href="/insights" className="ask-prompt" prefetch={false}><Sparkles size={20} /><span><small>Start researching</small>Analyze a current NBA player</span><ArrowRight size={20} /></Link></section>
+    <section className="insight-cta shell"><div className="orbital-mark"><ScanSearch size={55} /><i /><i /></div><div><span className="kicker">Ask CourtVision</span><h2>Your question.<br />The numbers behind it.</h2><p>Ask about current NBA players, comparisons, shot profiles, league leaders, metrics, and today&apos;s games.</p></div><Link href="/insights" className="ask-prompt" prefetch={false}><Sparkles size={20} /><span><small>Start a conversation</small>Ask CV anything about the NBA</span><ArrowRight size={20} /></Link></section>
   </>;
 }

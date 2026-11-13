@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
   <title id="title">CourtVision system architecture</title>
-  <desc id="desc">Hand-drawn style diagram showing the Next.js client, FastAPI application, data and intelligence layers, PostgreSQL, Redis, providers, machine learning, and OpenAI tool boundary.</desc>
+  <desc id="desc">Hand-drawn style diagram showing the Next.js client, CourtVision APIs, data and intelligence layers, PostgreSQL, Redis, NBA providers, machine learning, and grounded Ask CV boundary.</desc>
   <defs>
     <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence baseFrequency="0.012" numOctaves="2" seed="5" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5"/></filter>
     <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10" fill="none" stroke="#43d7e8" stroke-width="1.8"/></marker>
@@ -18,14 +18,14 @@
     <text x="90" y="225" class="title">Next.js client</text>
     <text x="90" y="252" class="sub">App Router · React · TypeScript</text>
     <text x="90" y="275" class="tiny">D3/SVG · Recharts · Query</text>
-    <text x="90" y="296" class="tiny">8 analytical routes</text>
+    <text x="90" y="296" class="tiny">chat + analytical routes</text>
 
     <rect x="445" y="150" width="325" height="165" rx="8" class="frame"/>
     <text x="470" y="185" class="label">APPLICATION</text>
-    <text x="470" y="225" class="title">FastAPI</text>
-    <text x="470" y="252" class="sub">Pydantic contracts · services</text>
-    <text x="470" y="275" class="tiny">REST · WebSocket gateway</text>
-    <text x="470" y="296" class="tiny">validation · rate limits · logs</text>
+    <text x="470" y="225" class="title">FastAPI + Sites Worker</text>
+    <text x="470" y="252" class="sub">Typed contracts · server-only secrets</text>
+    <text x="470" y="275" class="tiny">REST · chat · WebSocket gateway</text>
+    <text x="470" y="296" class="tiny">validation · CORS · no-store AI</text>
 
     <rect x="900" y="150" width="425" height="165" rx="8" class="frame"/>
     <text x="925" y="185" class="label">DOMAIN BOUNDARY</text>
@@ -57,9 +57,9 @@
 
     <rect x="1075" y="475" width="250" height="180" rx="8" class="ml"/>
     <text x="1100" y="510" class="label">RESEARCH</text>
-    <text x="1100" y="550" class="title">Typed AI tools</text>
-    <text x="1100" y="577" class="sub">Read-only retrieval + MCP</text>
-    <text x="1100" y="600" class="tiny">structured output · citations</text>
+    <text x="1100" y="550" class="title">Ask CV</text>
+    <text x="1100" y="577" class="sub">OpenAI Responses + NBA tools</text>
+    <text x="1100" y="600" class="tiny">grounded retrieval · citations</text>
     <text x="1100" y="622" class="tiny">no arbitrary generated SQL</text>
 
     <path d="M315 230 C360 210 395 210 445 230" class="arrow"/>

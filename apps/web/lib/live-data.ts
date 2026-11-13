@@ -32,6 +32,15 @@ export type LiveGamesPayload = {
   stale?: boolean;
 };
 
+export type AskHistoryMessage = { role: "user" | "assistant"; content: string };
+
+export type AskResponse = {
+  answer: string;
+  model: string;
+  sources: string[];
+  season: string;
+};
+
 export async function fetchLiveData<T>(path: string, signal?: AbortSignal): Promise<T> {
   const timeoutMs = path === "/api/games" ? 4_000 : 1_500;
   const requestSignal = signal
@@ -68,6 +77,29 @@ export async function fetchShotsData(playerId: string, season: string, signal?: 
     if (!response.ok) throw new Error("NBA shot snapshot is unavailable for this player");
     return response.json() as Promise<ShotsPayload>;
   }
+}
+
+export async function askCourtVision(
+  question: string,
+  history: AskHistoryMessage[],
+  signal?: AbortSignal,
+): Promise<AskResponse> {
+  const requestSignal = signal
+    ? AbortSignal.any([signal, AbortSignal.timeout(45_000)])
+    : AbortSignal.timeout(45_000);
+  const response = await fetch(`${LIVE_DATA_BASE}/api/ask`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, history }),
+    cache: "no-store",
+    credentials: "omit",
+    signal: requestSignal,
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null) as { error?: string } | null;
+    throw new Error(payload?.error ?? `Ask CV returned ${response.status}`);
+  }
+  return response.json() as Promise<AskResponse>;
 }
 
 export function displayNumber(value: number | null | undefined, digits = 1) {
