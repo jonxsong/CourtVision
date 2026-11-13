@@ -12,7 +12,7 @@ Status as of November 12, 2026.
 - [x] deterministic data provider
 - [x] Docker Compose topology
 - [x] local test/lint/type/build checks
-- [x] 84% branch-aware coverage across critical backend business logic
+- [x] 83% branch-aware coverage across critical backend business logic
 - [ ] migration replay against containerized PostgreSQL
 - [x] CI result captured on GitHub (`main` run 16, commit `b07cf9a`)
 
@@ -38,8 +38,8 @@ Status as of November 12, 2026.
 - [x] authenticated BALLDONTLIE free-tier adapter and score snapshot
 - [x] public live-score Worker with hosted secret, CORS, cache, and stale fallback
 - [ ] recurring ingestion scheduler
-- [ ] Redis Pub/Sub implementation
-- [ ] Redis fan-out, multi-instance gap recovery, and polling fallback
+- [x] Redis Pub/Sub implementation
+- [x] Redis fan-out, multi-instance gap recovery, and polling fallback
 - [x] credentialed free schedule/score provider
 - [ ] premium live play-by-play provider and redistribution-rights confirmation
 

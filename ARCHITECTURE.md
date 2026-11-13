@@ -82,4 +82,4 @@ PostgreSQL is the source of truth. Redis is not authoritative: it carries event 
 
 ## Next architecture milestones
 
-The real-time adapter, background scheduler, cache implementation, MCP server, and trained model registry are intentionally not marked complete. See [ROADMAP.md](ROADMAP.md).
+Redis fan-out, sequence-gap recovery, and polling fallback are implemented. The recurring ingestion scheduler, durable computed-view cache, MCP server, and trained model registry remain intentionally incomplete. See [ROADMAP.md](ROADMAP.md).

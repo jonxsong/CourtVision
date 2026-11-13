@@ -14,11 +14,11 @@ The FastAPI service publishes OpenAPI at `/docs` and `/openapi.json`. Default ba
 | GET | `/api/v1/shots` | Shot dataset by player and season |
 | POST | `/api/v1/predictions/baseline` | Transparent, unvalidated demo probability |
 | POST | `/api/v1/insights/query` | Grounded demo retrieval response |
-| WS | `/api/v1/ws/games/{id}` | Snapshot, heartbeat, and ordered historical replay |
+| WS | `/api/v1/ws/games/{id}` | Snapshot, Redis fan-out, gap recovery, polling fallback, and replay |
 
 ## WebSocket protocol
 
-The server opens with a complete `snapshot` containing `last_sequence`. Clients may send `{"type":"replay","after_sequence":9}` to receive ordered `event` messages followed by `replay_complete`, or `{"type":"ping"}` for a `pong`. Idle connections receive a heartbeat every 20 seconds. A reconnecting client should discard local speculative state, apply the new snapshot, then resume after its sequence.
+The server opens with a complete `snapshot` containing `last_sequence`. Clients may send `{"type":"replay","after_sequence":9}` to receive ordered `event` messages followed by `replay_complete`, or `{"type":"ping"}` for a `pong`. Versioned Redis messages fan out new events across API instances. A sequence gap triggers a database/provider snapshot recovery instead of speculative state; a Redis outage emits a recoverable `transport` message and switches the connection to polling. Idle connections receive a heartbeat with the active transport. A reconnecting client should discard local speculative state, apply the new snapshot, then resume after its sequence.
 
 ## Pagination
 

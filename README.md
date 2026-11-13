@@ -12,7 +12,7 @@
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
 [![CI](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml/badge.svg)](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-32_passing-66c78f?style=flat-square)](#verification)
+[![Tests](https://img.shields.io/badge/tests-40_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-168fa3?style=flat-square)](DATA_SOURCES.md)
 
 ### [Launch the public CourtVision experience →](https://courtvision-analytics.perkyaisle4.chatgpt.site)
@@ -46,7 +46,7 @@ The public `.chatgpt.site` deployment combines a static product experience with 
 | BALLDONTLIE adapter | Free players, teams, schedules, game state, and scores | ✅ verified |
 | Live score Worker | Hosted secret, CORS boundary, 60-second cache, stale fallback | ✅ public |
 | Idempotent ingestion | Checksummed jobs, provenance, stable event upserts | ✅ |
-| Redis/live event fan-out | Multi-instance Pub/Sub and premium play-by-play | planned |
+| Redis/live event fan-out | Versioned Pub/Sub, sequence-gap recovery, polling fallback | ✅ |
 | ML | Transparent demo baseline + chronological training pipeline | ✅ unvalidated |
 | Trained XGBoost + calibration | Needs licensed historical play-by-play corpus | blocked by data |
 | OpenAI Agents + MCP | Typed tool boundary designed; production integration | planned |
@@ -130,14 +130,15 @@ Current local checkpoint:
 - ESLint with zero warnings: pass
 - TypeScript strict check: pass
 - Vitest: 4 tests pass
-- Pytest: 25 tests pass
-- Critical backend business-logic coverage: 84% (branch coverage enabled; declarative ORM, command entrypoints, and DB wiring excluded)
+- Pytest: 33 tests pass
+- Live Worker: 3 tests pass
+- Critical backend business-logic coverage: 83% (branch coverage enabled; declarative ORM, command entrypoints, and DB wiring excluded)
 - Ruff: pass
 - mypy strict: pass
 - Docker Compose configuration validation: pass
 - Docker image build: not run in this checkpoint because the local Docker daemon was unavailable
 
-These are measured local results, not CI claims. Lighthouse, container integration, migration replay against PostgreSQL, and latency targets remain to be measured before a production release.
+The same web and API checks pass in GitHub Actions on `main`. Lighthouse, container integration, migration replay against PostgreSQL, and latency targets remain to be measured before a complete production release.
 
 ```bash
 pnpm lint
