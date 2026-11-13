@@ -3,6 +3,19 @@ export type Player = {
   id: string; slug: string; name: string; initials: string; position: string; number: string;
   team: Team; active: boolean;
 };
+export type PlayerStats = {
+  gamesPlayed: number; minutes: number; points: number; rebounds: number; assists: number;
+  steals: number; blocks: number; turnovers: number; fieldGoalPct: number; threePointPct: number;
+  freeThrowPct: number; plusMinus: number; trueShootingPct: number | null;
+  effectiveFieldGoalPct: number | null; usagePct: number | null; assistPct: number | null;
+  reboundPct: number | null; netRating: number | null; offensiveRating: number | null;
+  defensiveRating: number | null; pace: number | null; pie: number | null;
+};
+export type LivePlayer = Player & {
+  season: string;
+  bio: { height: string; weight: string; country: string; college: string; draft: string };
+  stats: PlayerStats;
+};
 export type Metric = {
   key: string; label: string; value: number; display: string; percentile: number; definition: string;
 };
