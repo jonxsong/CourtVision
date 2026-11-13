@@ -12,7 +12,7 @@
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
 [![CI](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml/badge.svg)](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-45_passing-66c78f?style=flat-square)](#verification)
+[![Tests](https://img.shields.io/badge/tests-46_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/data-real_NBA-168fa3?style=flat-square)](DATA_SOURCES.md)
 
 ### [Launch the public CourtVision experience →](https://courtvision-analytics.perkyaisle4.chatgpt.site)
@@ -132,7 +132,7 @@ Current local checkpoint:
 - TypeScript strict check: pass
 - Vitest: 1 test passes
 - Pytest: 33 tests pass
-- Live Worker: 11 tests pass
+- Live Worker: 12 tests pass
 - Critical backend business-logic coverage: 83% (branch coverage enabled; declarative ORM, command entrypoints, and DB wiring excluded)
 - Ruff: pass
 - mypy strict: pass

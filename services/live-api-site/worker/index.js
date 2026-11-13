@@ -9,10 +9,13 @@ const GAMES_CACHE_SECONDS = 60;
 const NBA_CACHE_SECONDS = 15 * 60;
 const ASK_MODEL = "gpt-6-luna";
 const ASK_MAX_ROUNDS = 4;
+const ASK_RATE_WINDOW_MS = 60_000;
+const ASK_RATE_LIMIT = 6;
 
 const gamesCache = { inFlight: null, value: null, updatedAt: 0 };
 const playersCache = { inFlight: null, value: null, updatedAt: 0 };
 const shotsCache = new Map();
+const askRateBuckets = new Map();
 
 const NBA_HEADERS = {
   Accept: "application/json",
@@ -192,6 +195,22 @@ function privateJson(payload, status = 200, origin = MAIN_SITE_ORIGIN) {
   const headers = responseHeaders(origin, 0);
   headers["cache-control"] = "no-store";
   return new Response(JSON.stringify(payload), { status, headers });
+}
+
+function allowAskRequest(request, now = Date.now()) {
+  const client = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for") ?? "unknown";
+  const current = askRateBuckets.get(client);
+  if (!current || now - current.startedAt >= ASK_RATE_WINDOW_MS) {
+    askRateBuckets.set(client, { startedAt: now, count: 1 });
+    return true;
+  }
+  current.count += 1;
+  if (askRateBuckets.size > 2_000) {
+    for (const [key, bucket] of askRateBuckets) {
+      if (now - bucket.startedAt >= ASK_RATE_WINDOW_MS) askRateBuckets.delete(key);
+    }
+  }
+  return current.count <= ASK_RATE_LIMIT;
 }
 
 function json(payload, status = 200, origin = MAIN_SITE_ORIGIN, cacheSeconds = GAMES_CACHE_SECONDS) {
@@ -660,6 +679,7 @@ function resetCachesForTest() {
   gamesCache.inFlight = null; gamesCache.value = null; gamesCache.updatedAt = 0;
   playersCache.inFlight = null; playersCache.value = null; playersCache.updatedAt = 0;
   shotsCache.clear();
+  askRateBuckets.clear();
 }
 
 export { currentSeason, easternDate, gameStatus, normalizeGame, normalizePlayer, normalizeShot, resetCachesForTest };
@@ -675,7 +695,10 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: responseHeaders(responseOrigin) });
     }
-    if (url.pathname === "/api/ask" && request.method === "POST") return askCourtVision(request, env, responseOrigin);
+    if (url.pathname === "/api/ask" && request.method === "POST") {
+      if (!allowAskRequest(request)) return privateJson({ error: "Ask CV rate limit reached. Try again in a minute." }, 429, responseOrigin);
+      return askCourtVision(request, env, responseOrigin);
+    }
     if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, responseOrigin);
     if (url.pathname === "/" || url.pathname === "/index.html") return statusPage(responseOrigin);
     if (url.pathname === "/health") {

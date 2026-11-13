@@ -206,6 +206,23 @@ test("validates Ask CV question length before calling OpenAI", async () => {
   assert.equal(response.status, 400);
 });
 
+test("rate limits repeated Ask CV requests from one client", async () => {
+  globalThis.fetch = async () => { throw new Error("fetch should not run"); };
+  let response;
+  for (let index = 0; index < 7; index += 1) {
+    response = await worker.fetch(
+      new Request("https://api.test/api/ask", {
+        method: "POST",
+        headers: { origin: MAIN_ORIGIN, "content-type": "application/json", "cf-connecting-ip": "203.0.113.7" },
+        body: JSON.stringify({ question: "" }),
+      }),
+      { COURTVISION_OPENAI_API_KEY: "openai-secret" },
+      { waitUntil() {} },
+    );
+  }
+  assert.equal(response.status, 429);
+});
+
 test("rejects an untrusted browser origin", async () => {
   const response = await worker.fetch(
     new Request("https://api.test/api/games", { headers: { origin: "https://evil.example" } }),
