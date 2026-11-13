@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/courtvision-readme-lockup.png" alt="CourtVision logo" width="720" />
+
 # COURTVISION
 
 ### See the game beyond the box score.
@@ -9,7 +11,7 @@
 [![Web](https://img.shields.io/badge/Next.js-16-0b0b0a?style=flat-square&logo=nextdotjs)](apps/web)
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
-[![Tests](https://img.shields.io/badge/tests-23_passing-66c78f?style=flat-square)](#verification)
+[![Tests](https://img.shields.io/badge/tests-24_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-ff6529?style=flat-square)](DATA_SOURCES.md)
 
 </div>
@@ -119,17 +121,21 @@ Current local checkpoint:
 - ESLint with zero warnings: pass
 - TypeScript strict check: pass
 - Vitest: 4 tests pass
-- Pytest: 19 tests pass
+- Pytest: 20 tests pass
+- Critical backend business-logic coverage: 91% (branch coverage enabled; declarative ORM and DB wiring excluded)
 - Ruff: pass
 - mypy strict: pass
+- Docker Compose configuration validation: pass
+- Docker image build: not run in this checkpoint because the local Docker daemon was unavailable
 
-These are measured local results, not CI claims. Lighthouse, container integration, coverage percentage, migration replay against PostgreSQL, and latency targets remain to be measured before a production release.
+These are measured local results, not CI claims. Lighthouse, container integration, migration replay against PostgreSQL, and latency targets remain to be measured before a production release.
 
 ```bash
 pnpm lint
 pnpm typecheck
 pnpm test:web
-.venv\Scripts\python -m pytest apps/api/tests
+.venv\Scripts\python -m coverage run --rcfile apps/api/pyproject.toml -m pytest apps/api/tests
+.venv\Scripts\python -m coverage report --rcfile apps/api/pyproject.toml
 .venv\Scripts\python -m ruff check apps/api/courtvision apps/api/tests
 .venv\Scripts\python -m mypy --config-file apps/api/pyproject.toml apps/api/courtvision
 pnpm build

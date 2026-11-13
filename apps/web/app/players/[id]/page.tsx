@@ -2,7 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
 import { MetricGrid } from "@/components/metric-grid";
-import { getProfile } from "@/lib/demo-data";
+import { getProfile, players } from "@/lib/demo-data";
+
+export function generateStaticParams() {
+  return players.map((player) => ({ id: player.id }));
+}
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params; const profile = getProfile(id); if (!profile) notFound();

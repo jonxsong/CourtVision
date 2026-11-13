@@ -34,7 +34,8 @@ pnpm --filter @courtvision/web typecheck
 pnpm --filter @courtvision/web test
 pnpm --filter @courtvision/web build
 
-.venv\Scripts\python -m pytest apps/api/tests
+.venv\Scripts\python -m coverage run --rcfile apps/api/pyproject.toml -m pytest apps/api/tests
+.venv\Scripts\python -m coverage report --rcfile apps/api/pyproject.toml
 .venv\Scripts\python -m ruff check apps/api/courtvision apps/api/tests
 .venv\Scripts\python -m mypy --config-file apps/api/pyproject.toml apps/api/courtvision
 ```

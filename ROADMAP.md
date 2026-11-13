@@ -12,6 +12,7 @@ Status as of November 12, 2026.
 - [x] deterministic data provider
 - [x] Docker Compose topology
 - [x] local test/lint/type/build checks
+- [x] 91% branch-aware coverage across critical backend business logic
 - [ ] migration replay against containerized PostgreSQL
 - [ ] CI result captured on GitHub
 

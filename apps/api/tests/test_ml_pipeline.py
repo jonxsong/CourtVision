@@ -7,6 +7,7 @@ from courtvision.ml.pipeline import (
     evaluate_probabilities,
     validate_training_frame,
 )
+from courtvision.ml.train import train
 
 
 def training_frame(games: int = 10) -> pd.DataFrame:
@@ -16,7 +17,9 @@ def training_frame(games: int = 10) -> pd.DataFrame:
             rows.append(
                 {
                     "game_id": f"game-{game}",
-                    "game_date": f"2025-01-{game + 1:02d}",
+                    "game_date": (
+                        pd.Timestamp("2025-01-01") + pd.Timedelta(days=game)
+                    ).date().isoformat(),
                     "home_won": game % 2,
                     "score_differential": event - 1,
                     "seconds_remaining": 1800 - event * 300,
@@ -55,3 +58,14 @@ def test_evaluation_returns_brier_and_log_loss():
 def test_evaluation_rejects_invalid_probabilities():
     with pytest.raises(ValueError, match="between zero and one"):
         evaluate_probabilities(pd.Series([0, 1]), np.array([-.1, 1.1]))
+
+
+def test_training_writes_versioned_artifact_and_report(tmp_path):
+    source = tmp_path / "events.csv"
+    output = tmp_path / "artifacts"
+    training_frame(games=70).to_csv(source, index=False)
+    report = train(source, output)
+    assert report["version"].startswith("wp-")
+    assert report["games"] == {"train": 49, "validation": 10, "test": 11}
+    assert (output / f"{report['version']}.joblib").exists()
+    assert (output / f"{report['version']}.json").exists()

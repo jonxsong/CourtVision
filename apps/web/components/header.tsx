@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Search, Sparkles } from "lucide-react";
 
 const links = [
@@ -11,6 +12,7 @@ export function Header() {
     <header className="site-header">
       <div className="header-inner">
         <Link href="/" className="brand" aria-label="CourtVision home">
+          <Image src="/brand/courtvision-mark.png" alt="" width={30} height={30} priority />
           <span>Court</span><strong>Vision</strong><i aria-hidden="true" />
         </Link>
         <nav aria-label="Primary navigation">
