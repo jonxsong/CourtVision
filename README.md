@@ -11,7 +11,7 @@
 [![Web](https://img.shields.io/badge/Next.js-16-0b0b0a?style=flat-square&logo=nextdotjs)](apps/web)
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
-[![Tests](https://img.shields.io/badge/tests-24_passing-66c78f?style=flat-square)](#verification)
+[![Tests](https://img.shields.io/badge/tests-29_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-168fa3?style=flat-square)](DATA_SOURCES.md)
 
 ### [Launch the public CourtVision experience →](https://courtvision-analytics.perkyaisle4.chatgpt.site)
@@ -38,16 +38,19 @@ The public `.chatgpt.site` deployment is a static product preview backed by thos
 | `/games/[id]` | Win-probability view and historical replay | ✅ |
 | `/shots` | Interactive SVG shot explorer | ✅ |
 | `/insights` | Grounded-analysis UX with fact/interpretation separation | ✅ demo retrieval |
+| `/operations` | Provider, ingestion, rights, and secret-handling status | ✅ |
 | FastAPI | Typed players, games, shots, replay, and baseline endpoints | ✅ |
 | PostgreSQL | Normalized schema and initial Alembic migration | ✅ |
 | Replay WebSocket | Snapshot, heartbeat, ordered resume | ✅ historical demo |
-| Redis/live provider | Multi-instance Pub/Sub and licensed live feed | planned |
+| BALLDONTLIE adapter | Free players, teams, schedules, game state, and scores | ✅ verified |
+| Idempotent ingestion | Checksummed jobs, provenance, stable event upserts | ✅ |
+| Redis/live event fan-out | Multi-instance Pub/Sub and premium play-by-play | planned |
 | ML | Transparent demo baseline + chronological training pipeline | ✅ unvalidated |
 | Trained XGBoost + calibration | Needs licensed historical play-by-play corpus | blocked by data |
 | OpenAI Agents + MCP | Typed tool boundary designed; production integration | planned |
 
 > [!IMPORTANT]
-> Every populated screen currently uses **deterministic synthetic fixtures**. CourtVision never presents those values as NBA statistics. Production ingestion should use a licensed provider such as Sportradar or a provider whose terms explicitly cover the intended product.
+> The game slate includes a timestamped real NBA score snapshot from BALLDONTLIE. Player analytics, shots, win probability, and possession replay remain **deterministic synthetic fixtures** and are labeled accordingly. No real and fictional records are silently combined.
 
 ## The product idea
 
@@ -125,8 +128,8 @@ Current local checkpoint:
 - ESLint with zero warnings: pass
 - TypeScript strict check: pass
 - Vitest: 4 tests pass
-- Pytest: 20 tests pass
-- Critical backend business-logic coverage: 91% (branch coverage enabled; declarative ORM and DB wiring excluded)
+- Pytest: 25 tests pass
+- Critical backend business-logic coverage: 84% (branch coverage enabled; declarative ORM, command entrypoints, and DB wiring excluded)
 - Ruff: pass
 - mypy strict: pass
 - Docker Compose configuration validation: pass

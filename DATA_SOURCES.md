@@ -18,7 +18,8 @@ Reviewed: November 12, 2026. Terms and commercial offerings change; re-review be
 |---|---|---|---|---|---|
 | CourtVision demo | Players, profiles, games, events, shots | Free; local | Fully deterministic | Fictional data owned by project | Default |
 | Sportradar NBA | Schedule, rosters, stats, live play-by-play; official NBA source in covered products | Trial available; commercial quote/plan required | Commercial SLA options | Contract must specify display, storage, and redistribution | Preferred production evaluation |
-| BALLDONTLIE | Players/games on free tier; richer box scores, plays, shot charts and win probabilities on paid tiers | Published tiers included 5/60/600 requests per minute at review time | Developer-oriented service | Review current terms and downstream display rights | Good prototype adapter candidate |
+| BALLDONTLIE | Players/games on free tier; richer box scores, plays, shot charts and win probabilities on paid tiers | Free tier: 5 requests/minute | Developer-oriented service | Review current terms and downstream display rights | Implemented for free schedule and scores |
+| `nba_api` | Community client for NBA.com stats and live endpoints | Unofficial endpoints throttle and may block cloud IPs | Community maintained | NBA.com terms restrict reuse and public display without permission | Local research only; never public production |
 | NBA.com/Stats | Broad first-party viewing experience | Not a supported downloadable developer feed | Endpoint behavior can change | NBA terms restrict many database, real-time, and commercial uses | Do not scrape |
 
 Primary references:
@@ -56,6 +57,12 @@ Every ingestion should capture:
 - normalized row version;
 - checksum and ingestion job ID;
 - freshness and last-success timestamps.
+
+## Implemented free mode
+
+Set `COURTVISION_DATA_PROVIDER=balldontlie` and provide `COURTVISION_BALLDONTLIE_API_KEY` through an ignored `.env` file or production secret manager. The adapter currently exposes real teams, players, schedules, game state, and scores. Paid-only fields return explicit unavailable states; CourtVision does not fill them with estimates.
+
+The public static deployment receives a timestamped, server-generated score snapshot. The provider key is never bundled into browser JavaScript. Continuous refresh requires the planned server-backed runtime or scheduled trusted updater.
 
 ## Rate protection
 

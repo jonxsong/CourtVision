@@ -46,6 +46,10 @@ Internal IDs are UUIDs. Vendor IDs live in `external_ids` JSON maps or unique ev
 - predictions: `(game_id, created_at)`;
 - ingestion monitoring: source and status.
 
+## Ingestion idempotency
+
+Migration `20261112_0002` adds provider version, batch checksum, target external ID, per-outcome row counts, and job metadata. Normalized play-by-play rows retain the source event checksum and ingestion job ID. Replayed batches use `(source_id, external_event_id)` as the conflict boundary: unchanged checksums are skipped, changed records are updated, and reordered input converges to the same batch checksum.
+
 ## Migration workflow
 
 ```bash

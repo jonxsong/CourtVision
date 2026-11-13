@@ -26,6 +26,27 @@ docker compose up --build
 
 For a faster native loop, run `pnpm dev` and `uvicorn courtvision.main:app --reload --port 8000` from `apps/api`.
 
+## Free live-data adapter
+
+Put the provider key in the ignored `.env` file—never source control:
+
+```env
+COURTVISION_DATA_PROVIDER=balldontlie
+COURTVISION_BALLDONTLIE_API_KEY=your_key
+```
+
+Validate authentication without printing the key:
+
+```bash
+.venv\Scripts\python -m courtvision.providers.check
+```
+
+Generate a browser-safe score snapshot for the static Site:
+
+```bash
+.venv\Scripts\python -m courtvision.providers.snapshot
+```
+
 ## Quality gates
 
 ```bash

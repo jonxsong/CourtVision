@@ -12,7 +12,7 @@ Status as of November 12, 2026.
 - [x] deterministic data provider
 - [x] Docker Compose topology
 - [x] local test/lint/type/build checks
-- [x] 91% branch-aware coverage across critical backend business logic
+- [x] 84% branch-aware coverage across critical backend business logic
 - [ ] migration replay against containerized PostgreSQL
 - [ ] CI result captured on GitHub
 
@@ -33,10 +33,14 @@ Status as of November 12, 2026.
 - [x] normalized ordered event contract
 - [x] historical replay interaction
 - [x] WebSocket snapshot/replay/heartbeat protocol
-- [ ] ingestion worker and scheduler
+- [x] provider-neutral ingestion contracts and checksummed job provenance
+- [x] idempotent event upserts under duplicate/reordered batches
+- [x] authenticated BALLDONTLIE free-tier adapter and score snapshot
+- [ ] recurring ingestion scheduler
 - [ ] Redis Pub/Sub implementation
 - [ ] Redis fan-out, multi-instance gap recovery, and polling fallback
-- [ ] credentialed live provider and rights confirmation
+- [x] credentialed free schedule/score provider
+- [ ] premium live play-by-play provider and redistribution-rights confirmation
 
 ## Phase 4 — Machine learning
 
@@ -62,7 +66,7 @@ Status as of November 12, 2026.
 ## Release gates
 
 - migrations run forward from an empty database and through one rollback rehearsal;
-- ingestion is idempotent under duplicated/reordered fixture events;
+- [x] ingestion is idempotent under duplicated/reordered fixture events;
 - model beats a baseline on sealed chronological test data;
 - critical backend business logic coverage is at least 80%;
 - representative production pages reach Lighthouse performance 90+;

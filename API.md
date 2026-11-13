@@ -41,6 +41,8 @@ List responses contain:
 
 Validation failures use FastAPI's 422 problem detail. Missing resources return 404. An adapter that is named but not configured fails application startup; it never falls back silently to demo data.
 
+When the free BALLDONTLIE adapter is active, `/players` and `/games` return real provider data with `is_demo: false`. Statistical player profiles, play-by-play, and shot charts that require a paid tier remain empty or explicitly unavailable; the API never substitutes fixture values into a real-provider response.
+
 ## Security contract
 
 - CORS accepts only configured origins.
