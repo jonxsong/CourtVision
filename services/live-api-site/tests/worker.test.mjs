@@ -12,13 +12,6 @@ test("normalizes Eastern game day and live states", () => {
 });
 
 test("serves a cached browser-safe live slate", async () => {
-  const cache = new Map();
-  globalThis.caches = {
-    default: {
-      async match(request) { return cache.get(request.url)?.clone(); },
-      async put(request, response) { cache.set(request.url, response.clone()); },
-    },
-  };
   let upstreamCalls = 0;
   globalThis.fetch = async (_url, options) => {
     upstreamCalls += 1;
@@ -34,11 +27,9 @@ test("serves a cached browser-safe live slate", async () => {
       visitor_team: { id: 2, abbreviation: "GSW", city: "Golden State", name: "Warriors" },
     }] }), { status: 200, headers: { "content-type": "application/json" } });
   };
-  const pending = [];
-  const ctx = { waitUntil(promise) { pending.push(promise); } };
+  const ctx = { waitUntil() {} };
   const request = new Request("https://api.test/api/games", { headers: { origin: MAIN_ORIGIN } });
   const first = await worker.fetch(request, { COURTVISION_BALLDONTLIE_API_KEY: "secret-value" }, ctx);
-  await Promise.all(pending);
   const second = await worker.fetch(request, { COURTVISION_BALLDONTLIE_API_KEY: "secret-value" }, ctx);
   const payload = await second.json();
 

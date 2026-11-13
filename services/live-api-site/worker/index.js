@@ -1,10 +1,10 @@
 const MAIN_SITE_ORIGIN = "https://courtvision-analytics.perkyaisle4.chatgpt.site";
 const PROVIDER_ORIGIN = "https://api.balldontlie.io";
-const CACHE_URL = "https://courtvision.internal/live-games";
 const CACHE_SECONDS = 60;
 
 let inFlight = null;
 let lastGood = null;
+let lastGoodAt = 0;
 
 function easternDate(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -88,10 +88,8 @@ async function fetchProvider(apiKey, now = new Date()) {
 }
 
 async function liveGames(env, ctx) {
-  const cache = caches.default;
-  const cacheKey = new Request(CACHE_URL);
-  const cached = await cache.match(cacheKey);
-  if (cached) return cached;
+  void ctx;
+  if (lastGood && Date.now() - lastGoodAt < CACHE_SECONDS * 1000) return json(lastGood);
   if (!env.COURTVISION_BALLDONTLIE_API_KEY) {
     return json({ error: "Live provider is not configured" }, 503);
   }
@@ -100,9 +98,8 @@ async function liveGames(env, ctx) {
     inFlight = fetchProvider(env.COURTVISION_BALLDONTLIE_API_KEY)
       .then((payload) => {
         lastGood = payload;
-        const response = json(payload);
-        ctx.waitUntil(cache.put(cacheKey, response.clone()));
-        return response;
+        lastGoodAt = Date.now();
+        return json(payload);
       })
       .finally(() => {
         inFlight = null;
