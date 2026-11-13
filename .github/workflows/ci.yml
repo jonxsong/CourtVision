@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @courtvision/web lint
+      - run: pnpm --filter @courtvision/web typecheck
+      - run: pnpm --filter @courtvision/web test
+      - run: pnpm --filter @courtvision/web build
+
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e "apps/api[dev]"
+      - run: python -m ruff check apps/api/courtvision apps/api/tests
+      - run: python -m mypy apps/api/courtvision
+      - run: python -m pytest apps/api/tests

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">CourtVision system architecture</title>
+  <desc id="desc">Hand-drawn style diagram showing the Next.js client, FastAPI application, data and intelligence layers, PostgreSQL, Redis, providers, machine learning, and OpenAI tool boundary.</desc>
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence baseFrequency="0.012" numOctaves="2" seed="5" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5"/></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10" fill="none" stroke="#ff7138" stroke-width="1.8"/></marker>
+    <style>
+      .bg{fill:#0b0b0a}.frame{fill:#11110f;stroke:#4b4943;stroke-width:2}.accent{fill:#17120f;stroke:#ff7138;stroke-width:2}.data{fill:#101516;stroke:#72b69a;stroke-width:2}.ml{fill:#15131a;stroke:#a390d0;stroke-width:2}.title{fill:#f2f0e9;font:700 19px Inter,Arial,sans-serif}.sub{fill:#aaa79f;font:13px Inter,Arial,sans-serif}.tiny{fill:#7d7a73;font:11px Consolas,monospace}.label{fill:#ff7138;font:700 12px Consolas,monospace;letter-spacing:1.5px}.arrow{fill:none;stroke:#ff7138;stroke-width:2;stroke-dasharray:8 5;marker-end:url(#arrow)}.mutedArrow{fill:none;stroke:#6b6861;stroke-width:1.6;stroke-dasharray:6 5;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="1400" height="820"/>
+  <text x="65" y="65" class="label">COURTVISION · SYSTEM MAP</text>
+  <text x="65" y="98" class="sub">Replaceable providers. One normalized event model. Transparent intelligence.</text>
+
+  <g filter="url(#rough)">
+    <rect x="65" y="150" width="250" height="165" rx="8" class="accent"/>
+    <text x="90" y="185" class="label">PRODUCT EDGE</text>
+    <text x="90" y="225" class="title">Next.js client</text>
+    <text x="90" y="252" class="sub">App Router · React · TypeScript</text>
+    <text x="90" y="275" class="tiny">D3/SVG · Recharts · Query</text>
+    <text x="90" y="296" class="tiny">8 analytical routes</text>
+
+    <rect x="445" y="150" width="325" height="165" rx="8" class="frame"/>
+    <text x="470" y="185" class="label">APPLICATION</text>
+    <text x="470" y="225" class="title">FastAPI</text>
+    <text x="470" y="252" class="sub">Pydantic contracts · services</text>
+    <text x="470" y="275" class="tiny">REST · WebSocket gateway</text>
+    <text x="470" y="296" class="tiny">validation · rate limits · logs</text>
+
+    <rect x="900" y="150" width="425" height="165" rx="8" class="frame"/>
+    <text x="925" y="185" class="label">DOMAIN BOUNDARY</text>
+    <text x="925" y="225" class="title">Provider abstraction</text>
+    <text x="925" y="252" class="sub">Fixtures today · licensed feed tomorrow</text>
+    <text x="925" y="275" class="tiny">validate → normalize → provenance</text>
+    <text x="925" y="296" class="tiny">retry → idempotent upsert → freshness</text>
+
+    <rect x="65" y="475" width="300" height="180" rx="8" class="data"/>
+    <text x="90" y="510" class="label">SYSTEM OF RECORD</text>
+    <text x="90" y="550" class="title">PostgreSQL</text>
+    <text x="90" y="577" class="sub">Normalized analytical model</text>
+    <text x="90" y="600" class="tiny">players · games · events · shots</text>
+    <text x="90" y="622" class="tiny">provenance · jobs · predictions</text>
+
+    <rect x="430" y="475" width="250" height="180" rx="8" class="data"/>
+    <text x="455" y="510" class="label">REAL TIME</text>
+    <text x="455" y="550" class="title">Redis</text>
+    <text x="455" y="577" class="sub">Pub/Sub · hot snapshots</text>
+    <text x="455" y="600" class="tiny">ordered event fan-out</text>
+    <text x="455" y="622" class="tiny">reconnect + stale detection</text>
+
+    <rect x="745" y="475" width="265" height="180" rx="8" class="ml"/>
+    <text x="770" y="510" class="label">PREDICTIVE</text>
+    <text x="770" y="550" class="title">ML pipeline</text>
+    <text x="770" y="577" class="sub">Chronological evaluation</text>
+    <text x="770" y="600" class="tiny">baseline → XGBoost → calibrate</text>
+    <text x="770" y="622" class="tiny">Brier · log loss · reliability</text>
+
+    <rect x="1075" y="475" width="250" height="180" rx="8" class="ml"/>
+    <text x="1100" y="510" class="label">RESEARCH</text>
+    <text x="1100" y="550" class="title">Typed AI tools</text>
+    <text x="1100" y="577" class="sub">Read-only retrieval + MCP</text>
+    <text x="1100" y="600" class="tiny">structured output · citations</text>
+    <text x="1100" y="622" class="tiny">no arbitrary generated SQL</text>
+
+    <path d="M315 230 C360 210 395 210 445 230" class="arrow"/>
+    <path d="M770 230 C820 210 850 210 900 230" class="arrow"/>
+    <path d="M1040 315 C1030 385 890 405 365 510" class="mutedArrow"/>
+    <path d="M590 315 C560 370 400 400 320 475" class="arrow"/>
+    <path d="M605 315 C620 380 625 410 600 475" class="arrow"/>
+    <path d="M365 570 C390 570 405 570 430 570" class="mutedArrow"/>
+    <path d="M680 570 C705 570 720 570 745 570" class="mutedArrow"/>
+    <path d="M1010 570 C1035 570 1050 570 1075 570" class="mutedArrow"/>
+    <path d="M1200 475 C1180 400 900 380 700 315" class="mutedArrow"/>
+  </g>
+
+  <text x="65" y="735" class="tiny">LIVE PATH</text>
+  <path d="M145 730 L255 730" class="arrow"/>
+  <text x="285" y="735" class="sub">Provider → ingestion → Postgres → Redis → WebSocket → client</text>
+  <text x="65" y="780" class="tiny">RULE</text>
+  <text x="115" y="780" class="sub">Historical replay and live updates share the same ordered, idempotent event contract.</text>
+</svg>
