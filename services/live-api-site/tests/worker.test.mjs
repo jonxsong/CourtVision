@@ -11,6 +11,21 @@ test("normalizes Eastern game day and live states", () => {
   assert.equal(gameStatus({ status_state: "final" }), "final");
 });
 
+test("serves an operational status page at the site root", async () => {
+  const response = await worker.fetch(
+    new Request("https://api.test/"),
+    {},
+    { waitUntil() {} },
+  );
+  const page = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type"), /^text\/html/);
+  assert.match(page, /Service online/);
+  assert.match(page, /href="\/api\/games"/);
+  assert.match(page, /courtvision-analytics\.perkyaisle4\.chatgpt\.site\/games/);
+});
+
 test("serves a cached browser-safe live slate", async () => {
   let upstreamCalls = 0;
   globalThis.fetch = async (_url, options) => {
