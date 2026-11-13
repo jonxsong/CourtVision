@@ -7,7 +7,7 @@
 
 The UI is a static Next.js export that hydrates a small live-score component. The Worker owns the BALLDONTLIE credential, normalizes the public response, permits the CourtVision origin, coalesces concurrent refreshes, caches successful data for 60 seconds, and serves the last-known-good payload when the provider fails.
 
-The development topology uses four containers: web, API, PostgreSQL, and Redis. This is not yet a production deployment claim.
+The development topology uses four containers: web, API, PostgreSQL, and Redis. The live-score path is deployed and production-verified; the complete container topology is not yet a production deployment claim.
 
 ## Build
 
@@ -45,6 +45,12 @@ See `.env.example`. Browser-visible variables must never contain secrets. `NEXT_
 6. deploy web;
 7. start workers;
 8. smoke-test demo/provider health and rollback if contracts fail.
+
+## Verified release checks
+
+- GitHub Actions CI passes on `main` for web lint, typecheck, tests, and build plus API lint, strict typing, tests, and coverage.
+- The public score surface hydrates through the hosted Worker and retains a static last-known-good snapshot during upstream errors.
+- The production page was checked for live refresh and horizontal overflow after the responsive fix.
 
 ## Targets not yet measured
 

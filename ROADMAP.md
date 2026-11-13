@@ -14,7 +14,7 @@ Status as of November 12, 2026.
 - [x] local test/lint/type/build checks
 - [x] 84% branch-aware coverage across critical backend business logic
 - [ ] migration replay against containerized PostgreSQL
-- [ ] CI result captured on GitHub
+- [x] CI result captured on GitHub (`main` run 16, commit `b07cf9a`)
 
 ## Phase 2 — Analytics
 

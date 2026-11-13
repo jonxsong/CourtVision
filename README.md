@@ -11,7 +11,8 @@
 [![Web](https://img.shields.io/badge/Next.js-16-0b0b0a?style=flat-square&logo=nextdotjs)](apps/web)
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
-[![Tests](https://img.shields.io/badge/tests-29_passing-66c78f?style=flat-square)](#verification)
+[![CI](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml/badge.svg)](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-32_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-168fa3?style=flat-square)](DATA_SOURCES.md)
 
 ### [Launch the public CourtVision experience →](https://courtvision-analytics.perkyaisle4.chatgpt.site)
@@ -22,7 +23,7 @@
 
 CourtVision is not a generic stats dashboard and it does not manufacture NBA data. It is a full-stack product foundation built around transparent provenance, normalized game events, reproducible analytics, and a premium editorial interface. The repository runs end-to-end without paid credentials using explicitly labeled fictional teams, players, games, and shots.
 
-The public `.chatgpt.site` deployment is a static product preview backed by those deterministic fixtures. The FastAPI, PostgreSQL, Redis, and provider integration remain available through the repository's server deployment path.
+The public `.chatgpt.site` deployment combines a static product experience with a server-side live-score Worker. The Worker securely retrieves and caches the current NBA slate; the deeper player, shot, replay, and modeling surfaces remain deterministic previews. FastAPI, PostgreSQL, Redis, and provider integrations are available through the repository's full server deployment path.
 
 ![CourtVision architecture](docs/architecture.svg)
 
