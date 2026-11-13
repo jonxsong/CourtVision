@@ -1,0 +1,16 @@
+{
+  "name": "courtvision",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "dev": "pnpm --filter @courtvision/web dev",
+    "build": "pnpm --filter @courtvision/web build",
+    "lint": "pnpm --filter @courtvision/web lint",
+    "typecheck": "pnpm --filter @courtvision/web typecheck",
+    "test": "pnpm -r test",
+    "test:web": "pnpm --filter @courtvision/web test",
+    "test:api": "python -m pytest apps/api/tests",
+    "check": "pnpm lint && pnpm typecheck && pnpm test"
+  }
+}
