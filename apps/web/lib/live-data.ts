@@ -1,4 +1,4 @@
-import type { LivePlayer, Shot } from "@/lib/types";
+import type { Game, LivePlayer, Shot } from "@/lib/types";
 
 export const LIVE_DATA_BASE = "https://courtvision-live-data.perkyaisle4.chatgpt.site";
 
@@ -18,6 +18,15 @@ export type ShotsPayload = {
   playerId: string;
   cacheSeconds: number;
   shots: Shot[];
+  stale?: boolean;
+};
+
+export type LiveGamesPayload = {
+  provider: "balldontlie";
+  fetchedAt: string;
+  gameDate: string;
+  cacheSeconds?: number;
+  games: Game[];
   stale?: boolean;
 };
 

@@ -11,7 +11,7 @@ export function Footer() {
       <div className="footer-meta">
         <Link href="/operations" prefetch={false}>Data operations</Link>
         <span>Built for transparent basketball analysis.</span>
-        <span>Demo fixtures are synthetic and clearly labeled.</span>
+        <span>Real NBA data · missing values are never fabricated.</span>
       </div>
     </footer>
   );

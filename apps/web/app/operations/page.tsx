@@ -12,16 +12,16 @@ import {
 } from "lucide-react";
 
 const pipeline = [
-  { icon: RadioTower, label: "Provider", detail: "BALLDONTLIE free API" },
-  { icon: Gauge, label: "Rate guard", detail: "5 requests / minute" },
+  { icon: RadioTower, label: "Providers", detail: "NBA Stats + BALLDONTLIE" },
+  { icon: Gauge, label: "Rate guard", detail: "60s games · 15m analytics" },
   { icon: ShieldCheck, label: "Normalize", detail: "Typed, validated records" },
   { icon: RefreshCw, label: "Upsert", detail: "Checksum + stable IDs" },
   { icon: Database, label: "Serve", detail: "Sites Worker → browser" },
 ];
 
 const sources = [
-  { name: "BALLDONTLIE", role: "Public connector", state: "Ready", detail: "Free teams, players, schedules, game state, and real-time scores.", tone: "ready" },
-  { name: "nba_api", role: "Local research", state: "Restricted", detail: "Rich NBA.com access, kept off the public deployment because source terms restrict reuse.", tone: "restricted" },
+  { name: "BALLDONTLIE", role: "Live games", state: "Online", detail: "Current schedules, game state, and real-time scores through the server-side key.", tone: "ready" },
+  { name: "NBA Stats / nba_api", role: "Player analytics", state: "Online", detail: "Active rosters, base and advanced player metrics, and real shot-location events.", tone: "ready" },
   { name: "Sportradar", role: "Production upgrade", state: "Optional", detail: "Official commercial path for contracted real-time play-by-play and redistribution rights.", tone: "optional" },
 ];
 
@@ -36,8 +36,8 @@ export default function OperationsPage() {
       </section>
 
       <section className="shell operations-status" aria-label="Connector status">
-        <article><CheckCircle2 size={18} /><span>Connector</span><strong>Free feed ready</strong><p>Real players, teams, schedules, game state, and scores.</p></article>
-        <article><ShieldCheck size={18} /><span>Safety rails</span><strong>25 backend tests</strong><p>Duplicate and reordered batches converge without duplicate rows.</p></article>
+        <article><CheckCircle2 size={18} /><span>Connectors</span><strong>Real NBA feeds online</strong><p>Players, shots, schedules, game state, and scores.</p></article>
+        <article><ShieldCheck size={18} /><span>Safety rails</span><strong>Validated contracts</strong><p>Timeouts, caches, schema normalization, and last-known-good responses.</p></article>
         <article><LockKeyhole size={18} /><span>Public runtime</span><strong>Live service online</strong><p>The hosted secret stays server-side behind a 60-second provider cache.</p></article>
       </section>
 
@@ -72,11 +72,11 @@ export default function OperationsPage() {
         <ol className="setup-steps">
           <li><span>1</span><div><strong>Authenticate the provider</strong><p>The free connector has now been verified against a real NBA slate.</p></div></li>
           <li><span>2</span><div><strong>Keep credentials server-side</strong><p>Use the ignored <code>.env</code> file locally and a secret manager in production.</p></div></li>
-          <li><span>3</span><div><strong>Promote only validated data</strong><p>Real schedules and scores replace fixtures only after schema and freshness checks.</p></div></li>
+          <li><span>3</span><div><strong>Never manufacture gaps</strong><p>Unavailable upstream values render as unavailable instead of becoming synthetic statistics.</p></div></li>
         </ol>
         <div className="setup-links">
           <a href="https://nba.balldontlie.io/" target="_blank" rel="noreferrer">Provider documentation <ArrowRight size={15} /></a>
-          <Link href="/games">View the current demo slate <ArrowRight size={15} /></Link>
+          <Link href="/games">View today&apos;s NBA slate <ArrowRight size={15} /></Link>
         </div>
       </section>
     </>

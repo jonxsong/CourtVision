@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Game } from "@/lib/types";
-import { DemoBadge } from "./demo-badge";
 import { TeamMark } from "./team-mark";
 
-export function GameCard({ game, compact = false, source = "demo", linked = true }: { game: Game; compact?: boolean; source?: "demo" | "live"; linked?: boolean }) {
+export function GameCard({ game, compact = false, linked = true }: { game: Game; compact?: boolean; linked?: boolean }) {
   const className = compact ? "game-card compact" : "game-card";
   const content = (
     <>
       <div className="game-card-top">
         <span>{game.status === "final" ? "Final" : game.status === "live" ? "Live" : "Scheduled"}</span>
-        {source === "demo" ? <DemoBadge compact /> : <span className="live-data-badge"><i /> Live provider</span>}
+        <span className="live-data-badge"><i /> NBA game</span>
       </div>
       <div className="matchup">
         <div><TeamMark team={game.away.team} size={compact ? "sm" : "md"} /><span><b>{game.away.team.city}</b><small>{game.away.record}</small></span></div>
@@ -23,5 +22,5 @@ export function GameCard({ game, compact = false, source = "demo", linked = true
       {!compact && <div className="game-card-bottom"><span>{game.headline}</span><ArrowUpRight size={16} /></div>}
     </>
   );
-  return linked ? <Link href={`/games/${game.id}`} className={className} prefetch={false}>{content}</Link> : <article className={className}>{content}</article>;
+  return linked ? <Link href={`/games/live?game=${game.id}`} className={className} prefetch={false}>{content}</Link> : <article className={className}>{content}</article>;
 }

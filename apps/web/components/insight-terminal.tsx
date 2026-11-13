@@ -1,20 +1,41 @@
 "use client";
 
-import { ArrowUp, Sparkles } from "lucide-react";
-import { FormEvent, useState } from "react";
-import { DemoBadge } from "./demo-badge";
-
-const prompts = ["What drives Miles Avery’s efficiency?", "Where did the game turn?", "Compare the top scoring profiles."];
+import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { displayNumber, displayPercent } from "@/lib/live-data";
+import { useLivePlayers } from "@/lib/use-live-players";
 
 export function InsightTerminal() {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState(false);
-  const submit = (event: FormEvent) => { event.preventDefault(); if (question.trim().length >= 3) setAnswer(true); };
-  return (
-    <div className="insight-terminal">
-      <div className="terminal-head"><span><Sparkles size={16} /> Research workspace</span><DemoBadge /></div>
-      {!answer ? <div className="terminal-empty"><div className="insight-glyph"><Sparkles size={35} /></div><h2>Ask a basketball question.</h2><p>Answers are built from typed statistical retrieval. Facts, sample sizes, and interpretation stay visibly separate.</p><div className="prompt-chips">{prompts.map(prompt => <button key={prompt} onClick={() => setQuestion(prompt)}>{prompt}</button>)}</div></div> : <article className="answer-card"><div className="answer-label"><Sparkles size={15} /> CourtVision analysis</div><h2>Miles Avery pairs scoring volume with efficient shot selection.</h2><p>In the deterministic 2025–26 demonstration dataset, Avery scores <strong>27.4 points per game</strong> on <strong>64.2% true shooting</strong> across 64 games.</p><div className="fact-grid"><div><small>Points per game</small><b>27.4</b><span>64-game sample</span></div><div><small>True shooting</small><b>64.2%</b><span>64-game sample</span></div><div><small>At-rim accuracy</small><b>68.4%</b><span>191 attempts</span></div></div><div className="interpretation"><small>Interpretation</small><p>The profile suggests that rim pressure and above-the-break volume create the efficiency. This is a descriptive interpretation, not a causal finding.</p></div><div className="limitations"><strong>Limitations</strong><span>Synthetic fixture data · No external model call · Not an NBA player</span></div></article>}
-      <form onSubmit={submit} className="question-box"><textarea aria-label="Ask CourtVision" placeholder="Ask about a player, game, or trend…" value={question} onChange={event => { setQuestion(event.target.value); setAnswer(false); }} /><button aria-label="Submit question"><ArrowUp size={18} /></button><small>Demo retrieval · numerical claims cite fixture data</small></form>
-    </div>
-  );
+  const { data, players, loading, error } = useLivePlayers();
+  const [playerId, setPlayerId] = useState("");
+  const [analyzed, setAnalyzed] = useState(false);
+
+  useEffect(() => {
+    if (!playerId && players.length) setPlayerId(players[0].id);
+  }, [playerId, players]);
+
+  const player = players.find((item) => item.id === playerId);
+  if (loading) return <div className="empty-state"><div><h2>Loading NBA research data…</h2></div></div>;
+  if (error || !player) return <div className="empty-state"><div><h2>Research data is unavailable.</h2><p>{error ?? "No active NBA player was returned."}</p></div></div>;
+
+  const scoringRead = player.stats.trueShootingPct === null
+    ? "Advanced efficiency is unavailable from the upstream response."
+    : player.stats.trueShootingPct >= 0.6
+      ? "The current scoring profile combines volume with above-threshold true-shooting efficiency."
+      : "The current scoring profile should be evaluated alongside role, shot mix, and team context.";
+
+  return <div className="insight-terminal">
+    <div className="terminal-head"><span><Sparkles size={16} /> NBA research workspace</span><span className="live-data-badge"><i /> NBA Stats</span></div>
+    {!analyzed ? <div className="terminal-empty"><div className="insight-glyph"><Sparkles size={35} /></div><h2>Inspect a real player profile.</h2><p>Select any active NBA player. CourtVision will retrieve current-season facts and keep its descriptive interpretation visibly separate.</p></div> : <article className="answer-card">
+      <div className="answer-label"><Sparkles size={15} /> CourtVision analysis · {data?.season}</div>
+      <h2>{player.name}: current-season statistical read</h2>
+      <p><strong>Retrieved facts:</strong> {player.name} is averaging <strong>{displayNumber(player.stats.points)} points</strong>, <strong>{displayNumber(player.stats.rebounds)} rebounds</strong>, and <strong>{displayNumber(player.stats.assists)} assists</strong> through {player.stats.gamesPlayed} games.</p>
+      <div className="fact-grid"><div><small>Points per game</small><b>{displayNumber(player.stats.points)}</b><span>{player.stats.gamesPlayed}-game sample</span></div><div><small>True shooting</small><b>{displayPercent(player.stats.trueShootingPct)}</b><span>NBA Stats advanced</span></div><div><small>Net rating</small><b>{displayNumber(player.stats.netRating)}</b><span>Per 100 possessions</span></div></div>
+      <div className="interpretation"><small>Interpretation</small><p>{scoringRead} This is descriptive, not a causal claim or player ranking.</p></div>
+      <div className="limitations"><strong>Limitations</strong><span>Current regular season · Team and role context not adjusted · Missing values remain unavailable</span></div>
+      <Link className="text-link" href={`/players/live?player=${player.id}`}>Open complete player profile <ArrowRight size={15} /></Link>
+    </article>}
+    <form onSubmit={(event) => { event.preventDefault(); setAnalyzed(true); }} className="question-box"><label className="sr-only" htmlFor="insight-player">NBA player</label><select id="insight-player" value={playerId} onChange={(event) => { setPlayerId(event.target.value); setAnalyzed(false); }}>{players.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.team.abbreviation}</option>)}</select><button aria-label="Analyze player"><ArrowRight size={18} /></button><small>Real current-season retrieval · no generated statistics</small></form>
+  </div>;
 }

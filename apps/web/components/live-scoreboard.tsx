@@ -2,19 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { GameCard } from "@/components/game-card";
-import type { Game } from "@/lib/types";
+import type { LiveGamesPayload } from "@/lib/live-data";
 
 const LIVE_DATA_URL = "https://courtvision-live-data.perkyaisle4.chatgpt.site/api/games";
 const REFRESH_MS = 60_000;
 
-export type LiveGamesPayload = {
-  provider: string;
-  fetchedAt: string;
-  gameDate: string;
-  cacheSeconds?: number;
-  games: Game[];
-  stale?: boolean;
-};
+export type { LiveGamesPayload } from "@/lib/live-data";
 
 function timestamp(value: string) {
   return new Intl.DateTimeFormat("en-US", {
@@ -71,7 +64,7 @@ export function LiveScoreboard({ initialData }: { initialData: LiveGamesPayload 
       </div>
       {data.games.length ? (
         <div className="games-grid games-page-grid">
-          {data.games.map((game) => <GameCard game={game} source="live" linked={false} key={game.id} />)}
+          {data.games.map((game) => <GameCard game={game} key={game.id} />)}
         </div>
       ) : (
         <div className="empty-state"><div><h2>No games on today&apos;s slate.</h2><p>The connector is online and will check again automatically.</p></div></div>
