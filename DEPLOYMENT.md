@@ -1,5 +1,12 @@
 # Deployment
 
+## Public Sites topology
+
+- UI: `https://courtvision-analytics.perkyaisle4.chatgpt.site`
+- Live data Worker: `https://courtvision-live-data.perkyaisle4.chatgpt.site`
+
+The UI is a static Next.js export that hydrates a small live-score component. The Worker owns the BALLDONTLIE credential, normalizes the public response, permits the CourtVision origin, coalesces concurrent refreshes, caches successful data for 60 seconds, and serves the last-known-good payload when the provider fails.
+
 The development topology uses four containers: web, API, PostgreSQL, and Redis. This is not yet a production deployment claim.
 
 ## Build

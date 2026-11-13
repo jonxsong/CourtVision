@@ -62,7 +62,7 @@ Every ingestion should capture:
 
 Set `COURTVISION_DATA_PROVIDER=balldontlie` and provide `COURTVISION_BALLDONTLIE_API_KEY` through an ignored `.env` file or production secret manager. The adapter currently exposes real teams, players, schedules, game state, and scores. Paid-only fields return explicit unavailable states; CourtVision does not fill them with estimates.
 
-The public static deployment receives a timestamped, server-generated score snapshot. The provider key is never bundled into browser JavaScript. Continuous refresh requires the planned server-backed runtime or scheduled trusted updater.
+The public deployment refreshes through a dedicated server-side Sites Worker with a 60-second provider cache and a last-known-good snapshot. The provider key is stored as a hosted secret and is never bundled into browser JavaScript.
 
 ## Rate protection
 

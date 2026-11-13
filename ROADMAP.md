@@ -36,6 +36,7 @@ Status as of November 12, 2026.
 - [x] provider-neutral ingestion contracts and checksummed job provenance
 - [x] idempotent event upserts under duplicate/reordered batches
 - [x] authenticated BALLDONTLIE free-tier adapter and score snapshot
+- [x] public live-score Worker with hosted secret, CORS, cache, and stale fallback
 - [ ] recurring ingestion scheduler
 - [ ] Redis Pub/Sub implementation
 - [ ] Redis fan-out, multi-instance gap recovery, and polling fallback

@@ -43,6 +43,7 @@ The public `.chatgpt.site` deployment is a static product preview backed by thos
 | PostgreSQL | Normalized schema and initial Alembic migration | ✅ |
 | Replay WebSocket | Snapshot, heartbeat, ordered resume | ✅ historical demo |
 | BALLDONTLIE adapter | Free players, teams, schedules, game state, and scores | ✅ verified |
+| Live score Worker | Hosted secret, CORS boundary, 60-second cache, stale fallback | ✅ public |
 | Idempotent ingestion | Checksummed jobs, provenance, stable event upserts | ✅ |
 | Redis/live event fan-out | Multi-instance Pub/Sub and premium play-by-play | planned |
 | ML | Transparent demo baseline + chronological training pipeline | ✅ unvalidated |
@@ -50,7 +51,7 @@ The public `.chatgpt.site` deployment is a static product preview backed by thos
 | OpenAI Agents + MCP | Typed tool boundary designed; production integration | planned |
 
 > [!IMPORTANT]
-> The game slate includes a timestamped real NBA score snapshot from BALLDONTLIE. Player analytics, shots, win probability, and possession replay remain **deterministic synthetic fixtures** and are labeled accordingly. No real and fictional records are silently combined.
+> The game slate refreshes real NBA scores through a server-side BALLDONTLIE Worker and retains a timestamped snapshot if that service is unavailable. Player analytics, shots, win probability, and possession replay remain **deterministic synthetic fixtures** and are labeled accordingly.
 
 ## The product idea
 
