@@ -14,11 +14,15 @@
 [![Tests](https://img.shields.io/badge/tests-24_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-168fa3?style=flat-square)](DATA_SOURCES.md)
 
+### [Launch the public CourtVision experience →](https://courtvision-analytics.perkyaisle4.chatgpt.site)
+
 </div>
 
 ---
 
 CourtVision is not a generic stats dashboard and it does not manufacture NBA data. It is a full-stack product foundation built around transparent provenance, normalized game events, reproducible analytics, and a premium editorial interface. The repository runs end-to-end without paid credentials using explicitly labeled fictional teams, players, games, and shots.
+
+The public `.chatgpt.site` deployment is a static product preview backed by those deterministic fixtures. The FastAPI, PostgreSQL, Redis, and provider integration remain available through the repository's server deployment path.
 
 ![CourtVision architecture](docs/architecture.svg)
 

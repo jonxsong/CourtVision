@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
-const isStaticExport = process.env.SITES_STATIC_EXPORT === "1";
+const isServerBuild = process.env.COURTVISION_SERVER_BUILD === "1";
 
 const nextConfig: NextConfig = {
-  output: isStaticExport ? "export" : "standalone",
+  output: isServerBuild ? "standalone" : "export",
   poweredByHeader: false,
   images: { unoptimized: true },
   experimental: { optimizePackageImports: ["lucide-react"] },
-  ...(isStaticExport ? {} : {
+  ...(isServerBuild ? {
     async headers() {
       return [
         {
@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
         }
       ];
     }
-  })
+  } : {})
 };
 
 export default nextConfig;

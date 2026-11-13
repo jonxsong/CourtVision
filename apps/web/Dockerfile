@@ -11,7 +11,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
-RUN pnpm --filter @courtvision/web build
+RUN pnpm --filter @courtvision/web build:server
 
 FROM node:24-alpine AS runner
 WORKDIR /app

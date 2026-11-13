@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:site": "cross-env SITES_STATIC_EXPORT=1 next build",
+    "build:site": "next build",
+    "build:server": "cross-env COURTVISION_SERVER_BUILD=1 next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
