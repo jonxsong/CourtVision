@@ -62,7 +62,10 @@ Status as of November 12, 2026.
 - [ ] OpenAI Agents SDK orchestration
 - [ ] Redis-backed rate limits and timeouts
 - [ ] OpenTelemetry export
-- [ ] security, accessibility, Lighthouse, and load benchmarks
+- [x] Lighthouse accessibility, best-practices, SEO, and CLS audit on optimized static build
+- [x] reproducible public live-API latency benchmark and failing p95 release gate
+- [ ] representative production Lighthouse performance 90+
+- [ ] security review and sustained-concurrency load benchmark
 
 ## Release gates
 
@@ -70,6 +73,6 @@ Status as of November 12, 2026.
 - [x] ingestion is idempotent under duplicated/reordered fixture events;
 - model beats a baseline on sealed chronological test data;
 - critical backend business logic coverage is at least 80%;
-- representative production pages reach Lighthouse performance 90+;
-- cached API p95 is below 200 ms under a published local benchmark;
+- representative production pages reach Lighthouse performance 90+ (latest optimized local mobile run: 83);
+- cached API p95 is below 200 ms under the repository benchmark (latest public run: 428.5 ms);
 - licensed-provider terms are recorded for the deployed use case.

@@ -135,6 +135,8 @@ Current local checkpoint:
 - Critical backend business-logic coverage: 83% (branch coverage enabled; declarative ORM, command entrypoints, and DB wiring excluded)
 - Ruff: pass
 - mypy strict: pass
+- Lighthouse mobile, optimized static build: 83 performance, 100 accessibility, 100 best practices, 100 SEO, 0 CLS (local server without compression/cache headers)
+- Public cached live API, 50 sequential requests: 109.6 ms p50, 428.5 ms p95; the 200 ms p95 release gate is not yet met
 - Docker Compose configuration validation: pass
 - Docker image build: not run in this checkpoint because the local Docker daemon was unavailable
 
@@ -149,6 +151,7 @@ pnpm test:web
 .venv\Scripts\python -m ruff check apps/api/courtvision apps/api/tests
 .venv\Scripts\python -m mypy --config-file apps/api/pyproject.toml apps/api/courtvision
 pnpm build
+pnpm benchmark:live-api -- 50
 ```
 
 ## Design principles

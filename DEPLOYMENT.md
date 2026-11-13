@@ -51,7 +51,9 @@ See `.env.example`. Browser-visible variables must never contain secrets. `NEXT_
 - GitHub Actions CI passes on `main` for web lint, typecheck, tests, and build plus API lint, strict typing, tests, and coverage.
 - The public score surface hydrates through the hosted Worker and retains a static last-known-good snapshot during upstream errors.
 - The production page was checked for live refresh and horizontal overflow after the responsive fix.
+- The optimized static build scores 100 for Lighthouse accessibility, best practices, and SEO with 0 CLS; the uncompressed local performance score is 83.
+- `pnpm benchmark:live-api -- 50` enforces the 200 ms cached p95 target and currently fails honestly (109.6 ms p50, 428.5 ms p95 in the latest run).
 
 ## Targets not yet measured
 
-The repository must not claim cached p95 below 200 ms, Lighthouse 90+, or 80% critical coverage until those benchmarks run in a representative release environment. They remain release gates in [ROADMAP.md](ROADMAP.md).
+Production Lighthouse performance 90+ and cached API p95 below 200 ms remain unmet release gates. Critical backend coverage is currently 83%. See [ROADMAP.md](ROADMAP.md) for the measured status.
