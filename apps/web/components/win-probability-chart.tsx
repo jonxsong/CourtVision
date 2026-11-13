@@ -14,7 +14,7 @@ export function WinProbabilityChart({ events }: { events: GameEvent[] }) {
       <div className="chart-label chart-label-mid">50%</div>
       <div className="chart-label chart-label-bottom">100% PIN</div>
       <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-        <defs><linearGradient id="wp-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ff6a2a" stopOpacity=".32"/><stop offset="1" stopColor="#ff6a2a" stopOpacity="0"/></linearGradient></defs>
+        <defs><linearGradient id="wp-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#43d7e8" stopOpacity=".32"/><stop offset="1" stopColor="#43d7e8" stopOpacity="0"/></linearGradient></defs>
         <line x1={pad} x2={width - pad} y1={height / 2} y2={height / 2} className="midline" />
         <path d={area} fill="url(#wp-fill)" />
         <path d={line} className="probability-line" />

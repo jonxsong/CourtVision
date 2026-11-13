@@ -3,9 +3,9 @@
   <desc id="desc">Hand-drawn style diagram showing the Next.js client, FastAPI application, data and intelligence layers, PostgreSQL, Redis, providers, machine learning, and OpenAI tool boundary.</desc>
   <defs>
     <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence baseFrequency="0.012" numOctaves="2" seed="5" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5"/></filter>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10" fill="none" stroke="#ff7138" stroke-width="1.8"/></marker>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10" fill="none" stroke="#43d7e8" stroke-width="1.8"/></marker>
     <style>
-      .bg{fill:#0b0b0a}.frame{fill:#11110f;stroke:#4b4943;stroke-width:2}.accent{fill:#17120f;stroke:#ff7138;stroke-width:2}.data{fill:#101516;stroke:#72b69a;stroke-width:2}.ml{fill:#15131a;stroke:#a390d0;stroke-width:2}.title{fill:#f2f0e9;font:700 19px Inter,Arial,sans-serif}.sub{fill:#aaa79f;font:13px Inter,Arial,sans-serif}.tiny{fill:#7d7a73;font:11px Consolas,monospace}.label{fill:#ff7138;font:700 12px Consolas,monospace;letter-spacing:1.5px}.arrow{fill:none;stroke:#ff7138;stroke-width:2;stroke-dasharray:8 5;marker-end:url(#arrow)}.mutedArrow{fill:none;stroke:#6b6861;stroke-width:1.6;stroke-dasharray:6 5;marker-end:url(#arrow)}
+      .bg{fill:#07121c}.frame{fill:#0b1824;stroke:#365064;stroke-width:2}.accent{fill:#0d2030;stroke:#43d7e8;stroke-width:2}.data{fill:#0c1d27;stroke:#72b69a;stroke-width:2}.ml{fill:#121827;stroke:#a390d0;stroke-width:2}.title{fill:#f1eee7;font:700 19px Inter,Arial,sans-serif}.sub{fill:#8fa4b3;font:13px Inter,Arial,sans-serif}.tiny{fill:#718895;font:11px Consolas,monospace}.label{fill:#43d7e8;font:700 12px Consolas,monospace;letter-spacing:1.5px}.arrow{fill:none;stroke:#43d7e8;stroke-width:2;stroke-dasharray:8 5;marker-end:url(#arrow)}.mutedArrow{fill:none;stroke:#607988;stroke-width:1.6;stroke-dasharray:6 5;marker-end:url(#arrow)}
     </style>
   </defs>
   <rect class="bg" width="1400" height="820"/>

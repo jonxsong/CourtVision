@@ -12,7 +12,7 @@
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
 [![Tests](https://img.shields.io/badge/tests-24_passing-66c78f?style=flat-square)](#verification)
-[![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-ff6529?style=flat-square)](DATA_SOURCES.md)
+[![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-168fa3?style=flat-square)](DATA_SOURCES.md)
 
 </div>
 
@@ -143,7 +143,7 @@ pnpm build
 
 ## Design principles
 
-The visual system uses near-black, warm off-white, and restrained basketball orange. Dense analytical surfaces are separated by editorial whitespace; animation is purposeful and reduced-motion aware. All primary actions are keyboard reachable, SVG charts have accessible labels, and loading/error/empty states are first-class.
+The visual system uses midnight navy, warm ivory, electric cyan, and a restrained coral signal accent. Dense analytical surfaces are separated by editorial whitespace; animation is purposeful and reduced-motion aware. All primary actions are keyboard reachable, SVG charts have accessible labels, and loading/error/empty states are first-class.
 
 ## Documentation
 
