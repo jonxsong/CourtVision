@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { fetchLiveData, type ShotsPayload } from "@/lib/live-data";
+import { fetchShotsData } from "@/lib/live-data";
 import type { Shot } from "@/lib/types";
 import { useLivePlayers } from "@/lib/use-live-players";
 import { Court } from "./court";
@@ -28,7 +28,7 @@ export function ShotExplorer() {
     setLoading(true);
     setError(null);
     setShots([]);
-    void fetchLiveData<ShotsPayload>(`/api/shots?player_id=${encodeURIComponent(playerId)}&season=${encodeURIComponent(playerData.season)}`, controller.signal)
+    void fetchShotsData(playerId, playerData.season, controller.signal)
       .then((payload) => setShots(payload.shots))
       .catch((reason: unknown) => {
         if (!(reason instanceof DOMException && reason.name === "AbortError")) setError(reason instanceof Error ? reason.message : "Shot data is unavailable");
@@ -58,7 +58,7 @@ export function ShotExplorer() {
         <label><small>Player</small><select value={playerId} onChange={(event) => setPlayerId(event.target.value)}>{players.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.team.abbreviation}</option>)}</select></label>
         <label><small>Season</small><select value={playerData?.season ?? ""} disabled><option>{playerData?.season ?? "Loading"}</option></select></label>
         <fieldset><legend>Result</legend><div className="segmented">{(["all", "made", "missed"] as const).map((value) => <button type="button" className={result === value ? "active" : ""} onClick={() => setResult(value)} key={value}>{value}</button>)}</div></fieldset>
-        <div className="shot-summary"><div><strong>{attempts ? (makes / attempts * 100).toFixed(1) : "—"}%</strong><span>FG</span></div><div><strong>{attempts}</strong><span>Attempts</span></div></div>
+        <div className="shot-summary"><div><strong>{attempts ? `${(makes / attempts * 100).toFixed(1)}%` : "—"}</strong><span>FG</span></div><div><strong>{attempts}</strong><span>Attempts</span></div></div>
         <div className="legend"><span><i className="made" />Made</span><span><i className="missed" />Missed</span></div>
       </aside>
       <div className="court-panel">

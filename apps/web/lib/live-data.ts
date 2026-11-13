@@ -9,6 +9,7 @@ export type PlayersPayload = {
   cacheSeconds: number;
   players: LivePlayer[];
   stale?: boolean;
+  snapshot?: boolean;
 };
 
 export type ShotsPayload = {
@@ -19,6 +20,7 @@ export type ShotsPayload = {
   cacheSeconds: number;
   shots: Shot[];
   stale?: boolean;
+  snapshot?: boolean;
 };
 
 export type LiveGamesPayload = {
@@ -31,16 +33,41 @@ export type LiveGamesPayload = {
 };
 
 export async function fetchLiveData<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const timeoutMs = path === "/api/games" ? 4_000 : 1_500;
+  const requestSignal = signal
+    ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)])
+    : AbortSignal.timeout(timeoutMs);
   const response = await fetch(`${LIVE_DATA_BASE}${path}`, {
     cache: "no-store",
     credentials: "omit",
-    signal,
+    signal: requestSignal,
   });
   if (!response.ok) {
     const payload = await response.json().catch(() => null) as { error?: string } | null;
     throw new Error(payload?.error ?? `CourtVision data service returned ${response.status}`);
   }
   return response.json() as Promise<T>;
+}
+
+export async function fetchPlayersData(): Promise<PlayersPayload> {
+  try {
+    return await fetchLiveData<PlayersPayload>("/api/players");
+  } catch {
+    const response = await fetch("/data/nba-players.json", { cache: "no-store" });
+    if (!response.ok) throw new Error("NBA player snapshot is unavailable");
+    return response.json() as Promise<PlayersPayload>;
+  }
+}
+
+export async function fetchShotsData(playerId: string, season: string, signal?: AbortSignal): Promise<ShotsPayload> {
+  try {
+    return await fetchLiveData<ShotsPayload>(`/api/shots?player_id=${encodeURIComponent(playerId)}&season=${encodeURIComponent(season)}`, signal);
+  } catch (reason) {
+    if (reason instanceof DOMException && reason.name === "AbortError") throw reason;
+    const response = await fetch(`/data/shots/${encodeURIComponent(playerId)}.json`, { cache: "no-store", signal });
+    if (!response.ok) throw new Error("NBA shot snapshot is unavailable for this player");
+    return response.json() as Promise<ShotsPayload>;
+  }
 }
 
 export function displayNumber(value: number | null | undefined, digits = 1) {

@@ -12,8 +12,8 @@
 [![API](https://img.shields.io/badge/FastAPI-typed-05998b?style=flat-square&logo=fastapi)](apps/api)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](apps/api/pyproject.toml)
 [![CI](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml/badge.svg)](https://github.com/jonxsong/CourtVision/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-40_passing-66c78f?style=flat-square)](#verification)
-[![Data](https://img.shields.io/badge/default_data-deterministic_fixtures-168fa3?style=flat-square)](DATA_SOURCES.md)
+[![Tests](https://img.shields.io/badge/tests-42_passing-66c78f?style=flat-square)](#verification)
+[![Data](https://img.shields.io/badge/data-real_NBA-168fa3?style=flat-square)](DATA_SOURCES.md)
 
 ### [Launch the public CourtVision experience →](https://courtvision-analytics.perkyaisle4.chatgpt.site)
 
@@ -21,9 +21,9 @@
 
 ---
 
-CourtVision is not a generic stats dashboard and it does not manufacture NBA data. It is a full-stack product foundation built around transparent provenance, normalized game events, reproducible analytics, and a premium editorial interface. The repository runs end-to-end without paid credentials using explicitly labeled fictional teams, players, games, and shots.
+CourtVision is not a generic stats dashboard and it does not manufacture NBA data. It is a full-stack basketball intelligence product built around transparent provenance, real NBA player statistics, observed shot coordinates, current game state, and a premium editorial interface. Missing upstream values remain unavailable instead of being estimated.
 
-The public `.chatgpt.site` deployment combines a static product experience with a server-side live-score Worker. The Worker securely retrieves and caches the current NBA slate; the deeper player, shot, replay, and modeling surfaces remain deterministic previews. FastAPI, PostgreSQL, Redis, and provider integrations are available through the repository's full server deployment path.
+The public `.chatgpt.site` deployment combines a static Next.js experience with a server-side data Worker. BALLDONTLIE supplies the current slate and scores. NBA Stats-compatible endpoints supply active rosters, base and advanced player metrics, and shot locations; versioned snapshots keep those surfaces available when NBA Stats blocks cloud egress.
 
 ![CourtVision architecture](docs/architecture.svg)
 
@@ -33,26 +33,26 @@ The public `.chatgpt.site` deployment combines a static product experience with 
 |---|---|:---:|
 | `/` | Editorial intelligence homepage | ✅ |
 | `/players` | Searchable player directory | ✅ |
-| `/players/[id]` | Player DNA, percentiles, trends, zones | ✅ |
+| `/players/live?player=` | Real NBA player profile and season metrics | ✅ |
 | `/compare` | Interactive side-by-side comparison lab | ✅ |
-| `/games` | Game slate and historical results | ✅ |
-| `/games/[id]` | Win-probability view and historical replay | ✅ |
-| `/shots` | Interactive SVG shot explorer | ✅ |
-| `/insights` | Grounded-analysis UX with fact/interpretation separation | ✅ demo retrieval |
+| `/games` | Current NBA game slate and scores | ✅ |
+| `/games/live?game=` | Clickable matchup detail with real game state | ✅ |
+| `/shots` | Real NBA shot coordinates on an interactive SVG court | ✅ |
+| `/insights` | Current-player statistical analysis with fact/interpretation separation | ✅ |
 | `/operations` | Provider, ingestion, rights, and secret-handling status | ✅ |
 | FastAPI | Typed players, games, shots, replay, and baseline endpoints | ✅ |
 | PostgreSQL | Normalized schema and initial Alembic migration | ✅ |
-| Replay WebSocket | Snapshot, heartbeat, ordered resume | ✅ historical demo |
 | BALLDONTLIE adapter | Free players, teams, schedules, game state, and scores | ✅ verified |
-| Live score Worker | Hosted secret, CORS boundary, 60-second cache, stale fallback | ✅ public |
+| NBA Stats snapshot pipeline | 523 players and 30,414 current-season shots | ✅ public |
+| Live data Worker | Hosted secret, CORS boundary, caches, real-data fallback | ✅ public |
 | Idempotent ingestion | Checksummed jobs, provenance, stable event upserts | ✅ |
 | Redis/live event fan-out | Versioned Pub/Sub, sequence-gap recovery, polling fallback | ✅ |
-| ML | Transparent demo baseline + chronological training pipeline | ✅ unvalidated |
+| ML | Chronological training pipeline; no public prediction without validation | research only |
 | Trained XGBoost + calibration | Needs licensed historical play-by-play corpus | blocked by data |
 | OpenAI Agents + MCP | Typed tool boundary designed; production integration | planned |
 
 > [!IMPORTANT]
-> The game slate refreshes real NBA scores through a server-side BALLDONTLIE Worker and retains a timestamped snapshot if that service is unavailable. Player analytics, shots, win probability, and possession replay remain **deterministic synthetic fixtures** and are labeled accordingly.
+> CourtVision's public experience contains only real NBA records. Player and shot snapshots are refreshed from NBA Stats and are used as last-known-good data when the hosted Worker cannot reach the upstream endpoint. The site does not substitute synthetic players, shots, or metrics.
 
 ## The product idea
 
@@ -60,8 +60,8 @@ CourtVision treats basketball as a connected event system:
 
 - Player DNA explains production, efficiency, shot shape, and comparable profiles.
 - Comparison Lab keeps season, pace, sample size, and normalization visible.
-- Game Intelligence connects probability movement to ordered play-by-play events.
-- Shot Explorer renders actual coordinates when a provider supplies them and shows an unavailable state otherwise.
+- Game Intelligence exposes the real schedule, score, status, venue, and tipoff available from the free provider; it does not fabricate missing play-by-play.
+- Shot Explorer renders observed NBA shot coordinates and per-zone efficiency for every player with current-season attempts.
 - Ask CourtVision is a statistical research interface—not an unrestricted SQL or chat surface.
 
 ## Start locally
@@ -109,6 +109,7 @@ CourtVision/
 ├── apps/
 │   ├── web/                 # Next.js App Router product UI
 │   └── api/                 # FastAPI, providers, models, migrations
+├── services/live-api-site/  # Public games, players, shots, and snapshot Worker
 ├── docs/                    # Rendered/editable architecture assets
 ├── .github/workflows/       # CI checks
 ├── docker-compose.yml       # Web + API + PostgreSQL + Redis
@@ -129,9 +130,9 @@ Current local checkpoint:
 - Next.js production build: pass
 - ESLint with zero warnings: pass
 - TypeScript strict check: pass
-- Vitest: 4 tests pass
+- Vitest: 1 test passes
 - Pytest: 33 tests pass
-- Live Worker: 3 tests pass
+- Live Worker: 8 tests pass
 - Critical backend business-logic coverage: 83% (branch coverage enabled; declarative ORM, command entrypoints, and DB wiring excluded)
 - Ruff: pass
 - mypy strict: pass
@@ -171,6 +172,6 @@ The visual system uses midnight navy, warm ivory, electric cyan, and a restraine
 
 ## License and data notice
 
-Source licensing has not yet been selected. NBA names, marks, statistics, and game accounts may carry separate rights and use restrictions. The repository includes no scraped NBA dataset and should not be deployed with NBA data until provider and redistribution rights are confirmed.
+Source licensing has not yet been selected. NBA names, marks, statistics, and game accounts may carry separate rights and use restrictions. This repository includes a timestamped current-season NBA Stats snapshot for the public no-cost experience; review source terms and obtain appropriate rights before commercial redistribution.
 
 <div align="center"><sub>Built to make the evidence as compelling as the story.</sub></div>

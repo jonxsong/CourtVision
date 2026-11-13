@@ -30,7 +30,7 @@
     <rect x="900" y="150" width="425" height="165" rx="8" class="frame"/>
     <text x="925" y="185" class="label">DOMAIN BOUNDARY</text>
     <text x="925" y="225" class="title">Provider abstraction</text>
-    <text x="925" y="252" class="sub">Fixtures today · licensed feed tomorrow</text>
+    <text x="925" y="252" class="sub">Real NBA snapshots · licensed feed ready</text>
     <text x="925" y="275" class="tiny">validate → normalize → provenance</text>
     <text x="925" y="296" class="tiny">retry → idempotent upsert → freshness</text>
 

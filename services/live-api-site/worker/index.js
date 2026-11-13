@@ -1,3 +1,5 @@
+import { BUNDLED_PLAYERS } from "./nba-snapshot.js";
+
 const MAIN_SITE_ORIGIN = "https://courtvision-analytics.perkyaisle4.chatgpt.site";
 const ALLOWED_ORIGINS = new Set([MAIN_SITE_ORIGIN, "http://localhost:3000"]);
 const PROVIDER_ORIGIN = "https://api.balldontlie.io";
@@ -321,6 +323,7 @@ async function livePlayers(origin) {
     return json(await playersCache.inFlight, 200, origin, NBA_CACHE_SECONDS);
   } catch {
     if (playersCache.value) return json({ ...playersCache.value, stale: true }, 200, origin, NBA_CACHE_SECONDS);
+    if (BUNDLED_PLAYERS.players.length) return json({ ...BUNDLED_PLAYERS, stale: true, snapshot: true }, 200, origin, NBA_CACHE_SECONDS);
     return json({ error: "NBA player data is temporarily unavailable" }, 503, origin, 30);
   }
 }

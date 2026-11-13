@@ -6,21 +6,20 @@ Reviewed: November 12, 2026. Terms and commercial offerings change; re-review be
 
 ## Current strategy
 
-1. Use the deterministic provider for development, testing, screenshots, and public source review.
-2. Do not scrape NBA.com or treat unofficial endpoints as a production contract.
-3. Use a licensed commercial feed for real NBA game accounts, live events, and redistribution.
-4. Enable only the capabilities explicitly included in the selected provider agreement.
-5. Store provenance and freshness beside every normalized dataset.
+1. Use BALLDONTLIE for the current NBA schedule, game state, and scores.
+2. Use NBA Stats-compatible endpoints through the `nba_api` contract for real player and shot data.
+3. Refresh versioned static snapshots so cloud-IP blocking does not make the public product unusable.
+4. Never replace missing upstream values with synthetic statistics.
+5. Store source, season, fetch time, and freshness beside every normalized dataset.
 
 ## Provider matrix
 
 | Source | Coverage | Cost/rate limits | Reliability | Rights / product fit | Decision |
 |---|---|---|---|---|---|
-| CourtVision demo | Players, profiles, games, events, shots | Free; local | Fully deterministic | Fictional data owned by project | Default |
 | Sportradar NBA | Schedule, rosters, stats, live play-by-play; official NBA source in covered products | Trial available; commercial quote/plan required | Commercial SLA options | Contract must specify display, storage, and redistribution | Preferred production evaluation |
 | BALLDONTLIE | Players/games on free tier; richer box scores, plays, shot charts and win probabilities on paid tiers | Free tier: 5 requests/minute | Developer-oriented service | Review current terms and downstream display rights | Implemented for free schedule and scores |
-| `nba_api` | Community client for NBA.com stats and live endpoints | Unofficial endpoints throttle and may block cloud IPs | Community maintained | NBA.com terms restrict reuse and public display without permission | Local research only; never public production |
-| NBA.com/Stats | Broad first-party viewing experience | Not a supported downloadable developer feed | Endpoint behavior can change | NBA terms restrict many database, real-time, and commercial uses | Do not scrape |
+| `nba_api` / NBA Stats | Active roster, season metrics, advanced rates, shot coordinates | No API key; unofficial endpoints throttle and may block cloud IPs | Community contract over unstable endpoints | Review NBA terms before public or commercial redistribution | Implemented with versioned snapshots |
+| NBA.com/Stats | Broad first-party viewing experience | Not a supported downloadable developer feed | Endpoint behavior can change | NBA terms restrict many database, real-time, and commercial uses | Upstream source; never treated as an SLA |
 
 Primary references:
 
@@ -58,11 +57,13 @@ Every ingestion should capture:
 - checksum and ingestion job ID;
 - freshness and last-success timestamps.
 
-## Implemented free mode
+## Implemented no-cost mode
 
-Set `COURTVISION_DATA_PROVIDER=balldontlie` and provide `COURTVISION_BALLDONTLIE_API_KEY` through an ignored `.env` file or production secret manager. The adapter currently exposes real teams, players, schedules, game state, and scores. Paid-only fields return explicit unavailable states; CourtVision does not fill them with estimates.
+BALLDONTLIE is configured with `COURTVISION_BALLDONTLIE_API_KEY` through a hosted secret. The public Worker exposes real schedules, game state, and scores through a 60-second cache.
 
-The public deployment refreshes through a dedicated server-side Sites Worker with a 60-second provider cache and a last-known-good snapshot. The provider key is stored as a hosted secret and is never bundled into browser JavaScript.
+`services/live-api-site/scripts/refresh-nba-snapshot.mjs` retrieves the current roster, per-game base and advanced metrics, and league-wide shot-chart detail. It writes one player snapshot plus per-player shot assets, allowing the browser to download only the selected player's attempts. The Worker also bundles the player snapshot as its cloud-egress fallback.
+
+The checked-in November 12, 2026 snapshot contains 523 active players and 30,414 real 2026–27 field-goal attempts. Refresh it with `node services/live-api-site/scripts/refresh-nba-snapshot.mjs` before releases.
 
 ## Rate protection
 

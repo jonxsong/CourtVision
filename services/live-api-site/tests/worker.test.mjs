@@ -64,6 +64,18 @@ test("serves active NBA players with real base and advanced statistics", async (
   assert.equal(calls.length, 3);
 });
 
+test("falls back to the bundled real NBA snapshot when NBA Stats blocks cloud egress", async () => {
+  globalThis.fetch = async () => { throw new Error("upstream blocked"); };
+  const response = await worker.fetch(new Request("https://api.test/api/players", { headers: { origin: MAIN_ORIGIN } }), {}, { waitUntil() {} });
+  const payload = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(payload.provider, "nba_stats");
+  assert.equal(payload.snapshot, true);
+  assert.ok(payload.players.length > 500);
+  assert.ok(payload.players.some((player) => player.name === "Stephen Curry"));
+});
+
 test("serves real NBA shot coordinates in court feet", async () => {
   globalThis.fetch = async (input) => {
     const url = new URL(input);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchLiveData, type PlayersPayload } from "@/lib/live-data";
+import { fetchPlayersData, type PlayersPayload } from "@/lib/live-data";
 
 let snapshot: PlayersPayload | null = null;
 let request: Promise<PlayersPayload> | null = null;
@@ -9,7 +9,7 @@ let request: Promise<PlayersPayload> | null = null;
 function loadPlayers() {
   if (snapshot) return Promise.resolve(snapshot);
   if (!request) {
-    request = fetchLiveData<PlayersPayload>("/api/players")
+    request = fetchPlayersData()
       .then((payload) => {
         snapshot = payload;
         return payload;

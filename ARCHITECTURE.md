@@ -8,11 +8,16 @@ CourtVision is a modular monolith: one web application, one API application, one
 
 ```mermaid
 flowchart LR
-    P[Licensed or demo provider] --> I[Ingestion worker]
+    B[BALLDONTLIE] --> W[Public data Worker]
+    N[NBA Stats / nba_api] --> S[Snapshot refresh]
+    S --> W
+    S --> WEB[Next.js static assets]
+    W --> WEB
+    P[Optional licensed provider] --> I[Ingestion worker]
     I --> V[Validation + normalization]
     V --> PG[(PostgreSQL)]
     PG --> API[FastAPI]
-    API --> WEB[Next.js]
+    API --> WEB
     PG --> R[(Redis Pub/Sub)]
     R --> WS[WebSocket gateway]
     WS --> WEB
@@ -27,7 +32,7 @@ flowchart LR
 
 ### Web application
 
-`apps/web` owns presentation, URL state, client interactions, and visualization. It never receives provider credentials. The deterministic preview data is duplicated locally so a production build can be generated without an API at build time; production runtime queries will use the versioned HTTP contract.
+`apps/web` owns presentation, URL state, client interactions, and visualization. It never receives provider credentials. Real current-season player and shot snapshots are bundled as static assets, with live Worker requests attempted first and snapshot fallback after a strict timeout.
 
 ### API application
 
@@ -43,7 +48,7 @@ flowchart LR
 4. produce normalized domain records;
 5. support idempotent upserts and resumable cursors.
 
-Only the deterministic adapter is enabled today. Credentialed provider names fail closed instead of silently returning fixtures.
+The public Worker uses BALLDONTLIE for games and NBA Stats-compatible endpoints for player and shot data. NBA Stats calls are sequential, time-bounded, and cached because simultaneous or cloud-origin calls can stall. The broader FastAPI provider boundary remains available for licensed integrations.
 
 ### Persistence
 
@@ -68,7 +73,7 @@ PostgreSQL is the source of truth. Redis is not authoritative: it carries event 
 | Streaming | Redis Pub/Sub + snapshots | Adequate fan-out without Kafka-scale overhead |
 | UI rendering | Next.js App Router | Server rendering plus rich client interactions |
 | Visualization | Native SVG/D3 + Recharts | Custom court geometry and standard charts |
-| Default data | Deterministic fictional fixtures | Reproducible and legally safe local experience |
+| Public data | Real NBA feeds + versioned snapshots | Useful no-cost product with graceful cloud-block fallback |
 | ML split | Chronological | Prevents future information leaking backward |
 | AI access | Typed read-only tools | Prevents arbitrary generated SQL |
 
