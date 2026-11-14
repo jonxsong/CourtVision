@@ -23,7 +23,7 @@
 
 CourtVision is not a generic stats dashboard and it does not manufacture NBA data. It is a full-stack basketball intelligence product built around transparent provenance, real NBA player statistics, observed shot coordinates, current game state, grounded AI research, and a premium editorial interface. Missing upstream values remain unavailable instead of being estimated.
 
-The public `.chatgpt.site` deployment combines a static Next.js experience with a server-side data Worker. BALLDONTLIE supplies the current slate and scores. NBA Stats-compatible endpoints supply active rosters, base and advanced player metrics, and shot locations; versioned snapshots keep those surfaces available when NBA Stats blocks cloud egress. Ask CV uses the OpenAI Responses API to answer questions through bounded, read-only tools over those same NBA sources.
+The public deployment at [courtvision.jonzhang.dev](https://courtvision.jonzhang.dev) combines a static Next.js experience with a server-side data Worker. BALLDONTLIE supplies the current slate and scores. NBA Stats-compatible endpoints supply active rosters, base and advanced player metrics, and shot locations; versioned snapshots keep those surfaces available when NBA Stats blocks cloud egress. Ask CV uses the OpenAI Responses API to answer questions through bounded, read-only tools over those same NBA sources.
 
 ![CourtVision architecture](docs/architecture.svg)
 
