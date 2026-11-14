@@ -112,8 +112,23 @@ test("serves a cached browser-safe live slate", async () => {
       datetime: "2026-11-13T03:00:00Z",
       status: "2nd Qtr",
       status_state: "in_progress",
+      period: 2,
+      time: "Q2 4:12",
       home_team_score: 51,
       visitor_team_score: 48,
+      home_q1: 27,
+      home_q2: 24,
+      home_q3: 0,
+      home_q4: 0,
+      visitor_q1: 25,
+      visitor_q2: 23,
+      visitor_q3: 0,
+      visitor_q4: 0,
+      home_timeouts_remaining: 5,
+      visitor_timeouts_remaining: 4,
+      home_in_bonus: true,
+      visitor_in_bonus: false,
+      ist_stage: "West Group A",
       home_team: { id: 1, abbreviation: "LAL", city: "Los Angeles", name: "Lakers" },
       visitor_team: { id: 2, abbreviation: "GSW", city: "Golden State", name: "Warriors" },
     }] }), { status: 200, headers: { "content-type": "application/json" } });
@@ -127,6 +142,12 @@ test("serves a cached browser-safe live slate", async () => {
   assert.equal(first.status, 200);
   assert.equal(payload.games[0].status, "live");
   assert.equal(payload.games[0].home.score, 51);
+  assert.equal(payload.games[0].clock, "Q2 4:12");
+  assert.deepEqual(payload.games[0].periodScores.home, [27, 24, null, null, null, null, null]);
+  assert.deepEqual(payload.games[0].periodScores.away, [25, 23, null, null, null, null, null]);
+  assert.deepEqual(payload.games[0].timeouts, { home: 5, away: 4 });
+  assert.deepEqual(payload.games[0].inBonus, { home: true, away: false });
+  assert.equal(payload.games[0].tournamentStage, "West Group A");
   assert.equal(upstreamCalls, 1);
 });
 

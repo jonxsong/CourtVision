@@ -30,6 +30,11 @@ export type Game = {
   home: { team: Team; score: number; record: string };
   away: { team: Team; score: number; record: string };
   venue: string; headline: string; isDemo: boolean;
+  period?: number | null; clock?: string | null;
+  periodScores?: { home: (number | null)[]; away: (number | null)[] };
+  timeouts?: { home: number | null; away: number | null };
+  inBonus?: { home: boolean; away: boolean };
+  postseason?: boolean; tournamentStage?: string | null;
 };
 export type GameEvent = {
   id: string; sequence: number; period: number; clock: string; eventType: string;

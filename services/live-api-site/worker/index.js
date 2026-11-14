@@ -75,6 +75,14 @@ function normalizeGame(game) {
   const home = team(game.home_team);
   const away = team(game.visitor_team);
   const status = gameStatus(game);
+  const period = nullableNumber(game.period);
+  const periodScore = (side, label, periodNumber) => {
+    const value = nullableNumber(game[`${side}_${label}`]);
+    if (value === null || status === "scheduled") return null;
+    if (status === "live" && period !== null && periodNumber > period) return null;
+    return value;
+  };
+  const periodLabels = ["q1", "q2", "q3", "q4", "ot1", "ot2", "ot3"];
   return {
     id: String(game.id ?? "unknown"),
     tipoffAt: String(game.datetime ?? game.date ?? ""),
@@ -83,6 +91,22 @@ function normalizeGame(game) {
     away: { team: away, score: Number(game.visitor_team_score ?? 0), record: "—" },
     venue: String(game.venue ?? "Venue unavailable"),
     headline: `${away.abbreviation} at ${home.abbreviation} · ${String(game.status ?? status)}`,
+    period,
+    clock: game.time ? String(game.time) : null,
+    periodScores: {
+      home: periodLabels.map((label, index) => periodScore("home", label, index + 1)),
+      away: periodLabels.map((label, index) => periodScore("visitor", label, index + 1)),
+    },
+    timeouts: {
+      home: nullableNumber(game.home_timeouts_remaining),
+      away: nullableNumber(game.visitor_timeouts_remaining),
+    },
+    inBonus: {
+      home: Boolean(game.home_in_bonus),
+      away: Boolean(game.visitor_in_bonus),
+    },
+    postseason: Boolean(game.postseason),
+    tournamentStage: game.ist_stage ? String(game.ist_stage) : null,
     isDemo: false,
   };
 }
