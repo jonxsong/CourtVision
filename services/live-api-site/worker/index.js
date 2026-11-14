@@ -1,7 +1,8 @@
 import { BUNDLED_PLAYERS } from "./nba-snapshot.js";
 
-const MAIN_SITE_ORIGIN = "https://courtvision-analytics.perkyaisle4.chatgpt.site";
-const ALLOWED_ORIGINS = new Set([MAIN_SITE_ORIGIN, "http://localhost:3000"]);
+const MAIN_SITE_ORIGIN = "https://courtvision.jonzhang.dev";
+const LEGACY_SITE_ORIGIN = "https://courtvision-analytics.perkyaisle4.chatgpt.site";
+const ALLOWED_ORIGINS = new Set([MAIN_SITE_ORIGIN, LEGACY_SITE_ORIGIN, "http://localhost:3000"]);
 const PROVIDER_ORIGIN = "https://api.balldontlie.io";
 const NBA_STATS_ORIGIN = "https://stats.nba.com";
 const OPENAI_ORIGIN = "https://api.openai.com";

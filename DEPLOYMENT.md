@@ -2,7 +2,8 @@
 
 ## Public Sites topology
 
-- UI: `https://courtvision-analytics.perkyaisle4.chatgpt.site`
+- Canonical UI: `https://courtvision.jonzhang.dev`
+- Sites platform URL: `https://courtvision-analytics.perkyaisle4.chatgpt.site`
 - Live data Worker: `https://courtvision-live-data.perkyaisle4.chatgpt.site`
 
 The UI is a static Next.js export that hydrates live data and Ask CV client components. The Worker owns the BALLDONTLIE and OpenAI credentials, normalizes public responses, permits the CourtVision origin, coalesces concurrent refreshes, caches successful NBA data, and serves the last-known-good payload when a data provider fails. Ask CV responses are private/no-store, never cached by the browser or CDN, and limited per client to bound public API usage.
@@ -33,7 +34,7 @@ docker compose ps
 
 ## Environment variables
 
-See `.env.example`. Browser-visible variables must never contain secrets. `NEXT_PUBLIC_API_URL` is safe because it contains only a public service URL.
+See `.env.example`. Browser-visible variables must never contain secrets. `NEXT_PUBLIC_SITE_URL` defines the canonical public origin and `NEXT_PUBLIC_API_URL` contains only a public service URL.
 
 Hosted Worker secrets are configured as `COURTVISION_BALLDONTLIE_API_KEY` and `COURTVISION_OPENAI_API_KEY`. Neither value belongs in source, the static export, or `.openai/hosting.json`.
 

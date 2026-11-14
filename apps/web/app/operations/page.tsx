@@ -11,6 +11,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+export const metadata = { title: "Data Operations", alternates: { canonical: "/operations" } };
+
 const pipeline = [
   { icon: RadioTower, label: "Providers", detail: "NBA Stats + BALLDONTLIE" },
   { icon: Gauge, label: "Rate guard", detail: "60s games · 15m analytics" },

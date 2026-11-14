@@ -15,7 +15,7 @@
 [![Tests](https://img.shields.io/badge/tests-46_passing-66c78f?style=flat-square)](#verification)
 [![Data](https://img.shields.io/badge/data-real_NBA-168fa3?style=flat-square)](DATA_SOURCES.md)
 
-### [Launch the public CourtVision experience →](https://courtvision-analytics.perkyaisle4.chatgpt.site)
+### [Launch the public CourtVision experience →](https://courtvision.jonzhang.dev)
 
 </div>
 

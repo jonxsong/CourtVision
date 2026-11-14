@@ -12,33 +12,29 @@ export function ShotExplorer() {
   const { data: playerData, players, loading: playersLoading, error: playersError } = useLivePlayers();
   const [playerId, setPlayerId] = useState("");
   const [result, setResult] = useState<"all" | "made" | "missed">("all");
-  const [shots, setShots] = useState<Shot[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [shotState, setShotState] = useState<{ key: string; shots: Shot[]; error: string | null }>({ key: "", shots: [], error: null });
+  const requested = players.find((player) => player.id === requestedPlayer);
+  const effectivePlayerId = playerId || requested?.id || players[0]?.id || "";
+  const requestKey = effectivePlayerId && playerData?.season ? `${effectivePlayerId}:${playerData.season}` : "";
 
   useEffect(() => {
-    if (!players.length || playerId) return;
-    const requested = players.find((player) => player.id === requestedPlayer);
-    setPlayerId(requested?.id ?? players[0].id);
-  }, [players, playerId, requestedPlayer]);
-
-  useEffect(() => {
-    if (!playerId || !playerData?.season) return;
+    if (!effectivePlayerId || !playerData?.season || !requestKey) return;
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
-    setShots([]);
-    void fetchShotsData(playerId, playerData.season, controller.signal)
-      .then((payload) => setShots(payload.shots))
+    void fetchShotsData(effectivePlayerId, playerData.season, controller.signal)
+      .then((payload) => setShotState({ key: requestKey, shots: payload.shots, error: null }))
       .catch((reason: unknown) => {
-        if (!(reason instanceof DOMException && reason.name === "AbortError")) setError(reason instanceof Error ? reason.message : "Shot data is unavailable");
-      })
-      .finally(() => setLoading(false));
+        if (!(reason instanceof DOMException && reason.name === "AbortError")) setShotState({ key: requestKey, shots: [], error: reason instanceof Error ? reason.message : "Shot data is unavailable" });
+      });
     return () => controller.abort();
-  }, [playerId, playerData?.season]);
+  }, [effectivePlayerId, playerData?.season, requestKey]);
 
-  const player = players.find((item) => item.id === playerId);
-  const filtered = useMemo(() => shots.filter((shot) => result === "all" || shot.made === (result === "made")), [shots, result]);
+  const loading = Boolean(requestKey && shotState.key !== requestKey);
+  const error = shotState.key === requestKey ? shotState.error : null;
+  const player = players.find((item) => item.id === effectivePlayerId);
+  const filtered = useMemo(() => {
+    const shots = shotState.key === requestKey ? shotState.shots : [];
+    return shots.filter((shot) => result === "all" || shot.made === (result === "made"));
+  }, [shotState, requestKey, result]);
   const attempts = filtered.length;
   const makes = filtered.filter((shot) => shot.made).length;
   const zones = [
@@ -55,7 +51,7 @@ export function ShotExplorer() {
     <div className="shot-layout">
       <aside className="shot-controls">
         <span className="live-data-badge"><i /> NBA Stats</span>
-        <label><small>Player</small><select value={playerId} onChange={(event) => setPlayerId(event.target.value)}>{players.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.team.abbreviation}</option>)}</select></label>
+        <label><small>Player</small><select value={effectivePlayerId} onChange={(event) => setPlayerId(event.target.value)}>{players.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.team.abbreviation}</option>)}</select></label>
         <label><small>Season</small><select value={playerData?.season ?? ""} disabled><option>{playerData?.season ?? "Loading"}</option></select></label>
         <fieldset><legend>Result</legend><div className="segmented">{(["all", "made", "missed"] as const).map((value) => <button type="button" className={result === value ? "active" : ""} onClick={() => setResult(value)} key={value}>{value}</button>)}</div></fieldset>
         <div className="shot-summary"><div><strong>{attempts ? `${(makes / attempts * 100).toFixed(1)}%` : "—"}</strong><span>FG</span></div><div><strong>{attempts}</strong><span>Attempts</span></div></div>

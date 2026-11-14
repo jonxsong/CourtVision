@@ -3,7 +3,7 @@ import test from "node:test";
 
 import worker, { currentSeason, easternDate, gameStatus, normalizeShot, resetCachesForTest } from "../worker/index.js";
 
-const MAIN_ORIGIN = "https://courtvision-analytics.perkyaisle4.chatgpt.site";
+const MAIN_ORIGIN = "https://courtvision.jonzhang.dev";
 
 test.beforeEach(() => resetCachesForTest());
 
@@ -27,7 +27,7 @@ test("serves an operational status page at the site root", async () => {
   assert.match(page, /Service online/);
   assert.match(page, /href="\/api\/games"/);
   assert.match(page, /href="\/api\/players"/);
-  assert.match(page, /courtvision-analytics\.perkyaisle4\.chatgpt\.site\/games/);
+  assert.match(page, /courtvision\.jonzhang\.dev\/games/);
 });
 
 test("serves active NBA players with real base and advanced statistics", async () => {

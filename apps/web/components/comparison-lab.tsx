@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeftRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { displayNumber, displayPercent } from "@/lib/live-data";
 import type { LivePlayer, PlayerStats } from "@/lib/types";
 import { useLivePlayers } from "@/lib/use-live-players";
@@ -28,16 +28,11 @@ export function ComparisonLab() {
   const [leftId, setLeftId] = useState("");
   const [rightId, setRightId] = useState("");
 
-  useEffect(() => {
-    if (players.length > 1 && !leftId && !rightId) {
-      setLeftId(players[0].id);
-      setRightId(players[1].id);
-    }
-  }, [players, leftId, rightId]);
-
-  const left = useMemo(() => players.find((player) => player.id === leftId), [players, leftId]);
-  const right = useMemo(() => players.find((player) => player.id === rightId), [players, rightId]);
-  const swap = () => { setLeftId(rightId); setRightId(leftId); };
+  const effectiveLeftId = leftId || players[0]?.id || "";
+  const effectiveRightId = rightId || players[1]?.id || "";
+  const left = useMemo(() => players.find((player) => player.id === effectiveLeftId), [players, effectiveLeftId]);
+  const right = useMemo(() => players.find((player) => player.id === effectiveRightId), [players, effectiveRightId]);
+  const swap = () => { setLeftId(effectiveRightId); setRightId(effectiveLeftId); };
 
   if (loading) return <div className="empty-state"><div><h2>Loading real NBA players…</h2><p>Current-season base and advanced statistics are on the way.</p></div></div>;
   if (error || !left || !right) return <div className="empty-state"><div><h2>Comparison data is unavailable.</h2><p>{error ?? "No active players were returned."}</p></div></div>;
@@ -46,9 +41,9 @@ export function ComparisonLab() {
     <div className="compare-lab">
       <div className="date-rule"><span>{players.length} active players · {data?.season}</span><b>Real NBA season statistics</b></div>
       <div className="compare-selectors">
-        <label><small>Player A</small><select value={leftId} onChange={(event) => setLeftId(event.target.value)}>{players.map((player) => <option value={player.id} key={player.id}>{player.name} · {player.team.abbreviation}</option>)}</select></label>
+        <label><small>Player A</small><select value={effectiveLeftId} onChange={(event) => setLeftId(event.target.value)}>{players.map((player) => <option value={player.id} key={player.id}>{player.name} · {player.team.abbreviation}</option>)}</select></label>
         <button onClick={swap} className="swap-button" aria-label="Swap players"><ArrowLeftRight size={19} /></button>
-        <label><small>Player B</small><select value={rightId} onChange={(event) => setRightId(event.target.value)}>{players.map((player) => <option value={player.id} key={player.id}>{player.name} · {player.team.abbreviation}</option>)}</select></label>
+        <label><small>Player B</small><select value={effectiveRightId} onChange={(event) => setRightId(event.target.value)}>{players.map((player) => <option value={player.id} key={player.id}>{player.name} · {player.team.abbreviation}</option>)}</select></label>
       </div>
       <div className="compare-stage">
         <div className="compare-player left"><span>{left.initials}</span><h2>{left.name}</h2><p>{left.team.abbreviation} · {left.position} · {left.season}</p></div>
